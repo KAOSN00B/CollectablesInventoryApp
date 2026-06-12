@@ -1,0 +1,27 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.GameInventoryApp" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/vault_surface</item>
+        <item name="android:statusBarColor">@color/vault_background</item>
+        <item name="colorPrimary">@color/vault_primary</item>
+        <item name="colorOnPrimary">@color/vault_on_primary</item>
+        <item name="colorSecondary">@color/vault_secondary</item>
+        <item name="colorOnSecondary">@color/vault_on_secondary</item>
+        <item name="colorSurface">@color/vault_surface</item>
+        <item name="colorSurfaceVariant">@color/vault_surface_high</item>
+        <item name="colorOnSurface">@color/vault_text</item>
+        <item name="colorOnSurfaceVariant">@color/vault_text_muted</item>
+        <item name="colorOutline">@color/vault_outline</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="materialCardViewStyle">@style/Widget.Collectos.Card</item>
+    </style>
+
+    <style name="Theme.GameInventoryApp" parent="Base.Theme.GameInventoryApp" />
+
+    <style name="Widget.Collectos.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">8dp</item>
+        <item name="cardBackgroundColor">@color/vault_surface</item>
+        <item name="strokeColor">@color/vault_outline</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+</resources>

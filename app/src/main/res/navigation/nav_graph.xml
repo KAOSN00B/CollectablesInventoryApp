@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/onboardingFragment">
+
+    <action android:id="@+id/action_global_barcodeScan" app:destination="@id/barcodeScanFragment" />
+    <action android:id="@+id/action_global_aiIdentify" app:destination="@id/aiIdentifyFragment" />
+    <action android:id="@+id/action_global_search" app:destination="@id/priceCheckFragment" />
+    <action android:id="@+id/action_global_addGame" app:destination="@id/addEditGameFragment" />
+    <action android:id="@+id/action_global_addConsole" app:destination="@id/addEditConsoleFragment" />
+    <action android:id="@+id/action_global_addCollectible" app:destination="@id/addEditCollectibleFragment" />
+    <action android:id="@+id/action_global_wishlist" app:destination="@id/wishlistListFragment" />
+
+    <fragment
+        android:id="@+id/onboardingFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.onboarding.OnboardingFragment"
+        android:label="Collectos">
+        <action
+            android:id="@+id/action_onboarding_to_dashboard"
+            app:destination="@id/dashboardFragment"
+            app:popUpTo="@id/onboardingFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.dashboard.DashboardFragment"
+        android:label="Home" />
+
+    <fragment
+        android:id="@+id/priceCheckFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.pricecheck.PriceCheckFragment"
+        android:label="Search">
+        <action android:id="@+id/action_priceCheck_to_addEditGame" app:destination="@id/addEditGameFragment" />
+        <action android:id="@+id/action_priceCheck_to_addEditCollectible" app:destination="@id/addEditCollectibleFragment" />
+        <action android:id="@+id/action_priceCheck_to_wishlistList" app:destination="@id/wishlistListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/collectionListFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.collection.CollectionListFragment"
+        android:label="Collection">
+        <action android:id="@+id/action_collectionList_to_gameDetail" app:destination="@id/gameDetailFragment" />
+        <action android:id="@+id/action_collectionList_to_consoleDetail" app:destination="@id/consoleDetailFragment" />
+        <action android:id="@+id/action_collectionList_to_collectibleDetail" app:destination="@id/collectibleDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/wishlistListFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.wishlist.WishlistListFragment"
+        android:label="Wishlist">
+        <action android:id="@+id/action_wishlistList_to_wishlistDetail" app:destination="@id/wishlistDetailFragment" />
+        <action android:id="@+id/action_wishlistList_to_addEditWishlist" app:destination="@id/addEditWishlistFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/gamesListFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.games.GamesListFragment"
+        android:label="My Games">
+        <action android:id="@+id/action_gamesList_to_gameDetail" app:destination="@id/gameDetailFragment" />
+        <action android:id="@+id/action_gamesList_to_addEditGame" app:destination="@id/addEditGameFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/gameDetailFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.games.GameDetailFragment"
+        android:label="Game Details">
+        <action android:id="@+id/action_gameDetail_to_addEditGame" app:destination="@id/addEditGameFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addEditGameFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.games.AddEditGameFragment"
+        android:label="Add / Edit Game" />
+
+    <fragment
+        android:id="@+id/consolesListFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.consoles.ConsolesListFragment"
+        android:label="My Consoles">
+        <action android:id="@+id/action_consolesList_to_consoleDetail" app:destination="@id/consoleDetailFragment" />
+        <action android:id="@+id/action_consolesList_to_addEditConsole" app:destination="@id/addEditConsoleFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/consoleDetailFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.consoles.ConsoleDetailFragment"
+        android:label="Console Details">
+        <action android:id="@+id/action_consoleDetail_to_addEditConsole" app:destination="@id/addEditConsoleFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addEditConsoleFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.consoles.AddEditConsoleFragment"
+        android:label="Add / Edit Console" />
+
+    <fragment
+        android:id="@+id/collectiblesListFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.collectibles.CollectiblesListFragment"
+        android:label="Collectibles">
+        <action android:id="@+id/action_collectiblesList_to_collectibleDetail" app:destination="@id/collectibleDetailFragment" />
+        <action android:id="@+id/action_collectiblesList_to_addEditCollectible" app:destination="@id/addEditCollectibleFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/collectibleDetailFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.collectibles.CollectibleDetailFragment"
+        android:label="Collectible Details">
+        <action android:id="@+id/action_collectibleDetail_to_addEditCollectible" app:destination="@id/addEditCollectibleFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addEditCollectibleFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.collectibles.AddEditCollectibleFragment"
+        android:label="Add / Edit Collectible" />
+
+    <fragment
+        android:id="@+id/wishlistDetailFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.wishlist.WishlistDetailFragment"
+        android:label="Wishlist Item">
+        <action android:id="@+id/action_wishlistDetail_to_addEditWishlist" app:destination="@id/addEditWishlistFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addEditWishlistFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.wishlist.AddEditWishlistFragment"
+        android:label="Add / Edit Wishlist Item" />
+
+    <fragment
+        android:id="@+id/barcodeScanFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.smart_add.BarcodeScanFragment"
+        android:label="Scan Barcode">
+        <action android:id="@+id/action_barcodeScan_to_addEditGame" app:destination="@id/addEditGameFragment" />
+        <action android:id="@+id/action_barcodeScan_to_addEditConsole" app:destination="@id/addEditConsoleFragment" />
+        <action android:id="@+id/action_barcodeScan_to_addEditCollectible" app:destination="@id/addEditCollectibleFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/aiIdentifyFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.smart_add.AiIdentifyFragment"
+        android:label="Search Catalog">
+        <action android:id="@+id/action_aiIdentify_to_addEditGame" app:destination="@id/addEditGameFragment" />
+        <action android:id="@+id/action_aiIdentify_to_addEditConsole" app:destination="@id/addEditConsoleFragment" />
+        <action android:id="@+id/action_aiIdentify_to_addEditCollectible" app:destination="@id/addEditCollectibleFragment" />
+    </fragment>
+
+</navigation>
