@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Collection {
+  id          Int      @id @default(autoincrement())
+  publicCode  String   @unique
+  displayName String?
+  createdAt   DateTime @default(now())
+
+  items    CollectionItem[]
+  wishlist WishlistItem[]
+
+  @@map("collections")
+}
+
+model CatalogItem {
+  id             Int     @id @default(autoincrement())
+  type           String  // "GAME" or "CONSOLE"
+  title          String
+  platform       String
+  upc            String?
+  looseValue     Float   @default(0)
+  cibValue       Float   @default(0)
+  newValue       Float   @default(0)
+  genre          String?
+  releaseYear    Int?
+  imageUrl       String?
+  searchableText String  // title + platform + genre for pg_trgm fuzzy search
+
+  items         CollectionItem[]
+  wishlistItems WishlistItem[]
+
+  @@unique([title, platform])
+  @@map("catalog_items")
+}
+
+model CollectionItem {
+  id             Int      @id @default(autoincrement())
+  collectionId   Int
+  catalogItemId  Int?
+  type           String   // "GAME" or "CONSOLE"
+  title          String
+  platform       String
+  condition      String   // "LOOSE", "CIB", "NEW", "POOR"
+  purchasePrice  Float    @default(0)
+  estimatedValue Float    @default(0)
+  notes          String?
+  forTrade       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  collection  Collection   @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  catalogItem CatalogItem? @relation(fields: [catalogItemId], references: [id])
+
+  @@map("collection_items")
+}
+
+model WishlistItem {
+  id                    Int     @id @default(autoincrement())
+  collectionId          Int
+  catalogItemId         Int?
+  title                 String
+  platform              String
+  targetPrice           Float   @default(0)
+  currentEstimatedValue Float   @default(0)
+  notes                 String?
+  isGrail               Boolean @default(false)
+
+  collection  Collection   @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  catalogItem CatalogItem? @relation(fields: [catalogItemId], references: [id])
+
+  @@map("wishlist_items")
+}

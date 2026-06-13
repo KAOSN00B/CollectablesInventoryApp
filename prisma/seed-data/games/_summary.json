@@ -1,0 +1,196 @@
+{
+  "generatedAt": "2026-06-12T22:26:24.469Z",
+  "targetPerPlatform": 400,
+  "total": 6714,
+  "platforms": [
+    {
+      "file": "switch.json",
+      "platform": "Switch",
+      "count": 400,
+      "sourceRows": 475,
+      "sourcePages": [
+        "List of Nintendo Switch games (0-9)",
+        "List of Nintendo Switch games (A-Am)",
+        "List of Nintendo Switch games (An-Az)",
+        "List of Nintendo Switch games (B)",
+        "List of Nintendo Switch games (C-G)",
+        "List of Nintendo Switch games (H-P)",
+        "List of Nintendo Switch games (Q-Z)"
+      ]
+    },
+    {
+      "file": "ps5.json",
+      "platform": "PS5",
+      "count": 400,
+      "sourceRows": 1122,
+      "sourcePages": [
+        "List of PlayStation 5 games"
+      ]
+    },
+    {
+      "file": "ps4.json",
+      "platform": "PS4",
+      "count": 400,
+      "sourceRows": 3603,
+      "sourcePages": [
+        "List of PlayStation 4 games (A–L)",
+        "List of PlayStation 4 games (M–Z)"
+      ]
+    },
+    {
+      "file": "ps2.json",
+      "platform": "PS2",
+      "count": 400,
+      "sourceRows": 4488,
+      "sourcePages": [
+        "List of PlayStation 2 games (A–K)",
+        "List of PlayStation 2 games (L–Z)"
+      ]
+    },
+    {
+      "file": "ps1.json",
+      "platform": "PS1",
+      "count": 400,
+      "sourceRows": 4284,
+      "sourcePages": [
+        "List of PlayStation (console) games (A–L)",
+        "List of PlayStation (console) games (M–Z)"
+      ]
+    },
+    {
+      "file": "xbox.json",
+      "platform": "Xbox",
+      "count": 400,
+      "sourceRows": 991,
+      "sourcePages": [
+        "List of Xbox games"
+      ]
+    },
+    {
+      "file": "gamecube.json",
+      "platform": "GameCube",
+      "count": 400,
+      "sourceRows": 665,
+      "sourcePages": [
+        "List of GameCube games"
+      ]
+    },
+    {
+      "file": "gba.json",
+      "platform": "GBA",
+      "count": 400,
+      "sourceRows": 1552,
+      "sourcePages": [
+        "List of Game Boy Advance games"
+      ]
+    },
+    {
+      "file": "n64.json",
+      "platform": "N64",
+      "count": 344,
+      "sourceRows": 400,
+      "sourcePages": [
+        "List of Nintendo 64 games"
+      ]
+    },
+    {
+      "file": "snes.json",
+      "platform": "SNES",
+      "count": 400,
+      "sourceRows": 1840,
+      "sourcePages": [
+        "List of Super Nintendo Entertainment System games"
+      ]
+    },
+    {
+      "file": "genesis.json",
+      "platform": "Genesis",
+      "count": 400,
+      "sourceRows": 958,
+      "sourcePages": [
+        "List of Sega Genesis games"
+      ]
+    },
+    {
+      "file": "dreamcast.json",
+      "platform": "Dreamcast",
+      "count": 400,
+      "sourceRows": 742,
+      "sourcePages": [
+        "List of Dreamcast games"
+      ]
+    },
+    {
+      "file": "saturn.json",
+      "platform": "Saturn",
+      "count": 400,
+      "sourceRows": 1138,
+      "sourcePages": [
+        "List of Sega Saturn games"
+      ]
+    },
+    {
+      "file": "game_boy.json",
+      "platform": "Game Boy",
+      "count": 400,
+      "sourceRows": 1176,
+      "sourcePages": [
+        "List of Game Boy games"
+      ]
+    },
+    {
+      "file": "game_boy_color.json",
+      "platform": "Game Boy Color",
+      "count": 400,
+      "sourceRows": 936,
+      "sourcePages": [
+        "List of Game Boy Color games"
+      ]
+    },
+    {
+      "file": "virtual_boy.json",
+      "platform": "Virtual Boy",
+      "count": 17,
+      "sourceRows": 24,
+      "sourcePages": [
+        "List of Virtual Boy games"
+      ]
+    },
+    {
+      "file": "atari_2600.json",
+      "platform": "Atari 2600",
+      "count": 400,
+      "sourceRows": 590,
+      "sourcePages": [
+        "List of Atari 2600 games"
+      ]
+    },
+    {
+      "file": "atari_7800.json",
+      "platform": "Atari 7800",
+      "count": 172,
+      "sourceRows": 190,
+      "sourcePages": [
+        "List of Atari 7800 games"
+      ]
+    },
+    {
+      "file": "jaguar.json",
+      "platform": "Jaguar",
+      "count": 58,
+      "sourceRows": 67,
+      "sourcePages": [
+        "List of Atari Jaguar games"
+      ]
+    },
+    {
+      "file": "lynx.json",
+      "platform": "Lynx",
+      "count": 123,
+      "sourceRows": 139,
+      "sourcePages": [
+        "List of Atari Lynx games"
+      ]
+    }
+  ]
+}
