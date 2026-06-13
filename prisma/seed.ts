@@ -49,40 +49,27 @@ function loadCatalogEntries(seedDir: string): CatalogEntry[] {
   return entries;
 }
 
+const BATCH_SIZE = 500;
+
 async function main() {
   const seedDir = path.join(__dirname, "seed-data", "games");
   const entries = loadCatalogEntries(seedDir);
 
-  let upserted = 0;
-  for (const entry of entries) {
-    await prisma.catalogItem.upsert({
-      where: {
-        title_platform: {
-          title: entry.title,
-          platform: entry.platform,
-        },
-      },
-      update: {
-        type: entry.type,
-        upc: entry.upc,
-        looseValue: entry.looseValue,
-        cibValue: entry.cibValue,
-        newValue: entry.newValue,
-        genre: entry.genre,
-        releaseYear: entry.releaseYear,
-        searchableText: entry.searchableText,
-      },
-      create: entry,
+  let inserted = 0;
+  for (let i = 0; i < entries.length; i += BATCH_SIZE) {
+    const batch = entries.slice(i, i + BATCH_SIZE);
+    const result = await prisma.catalogItem.createMany({
+      data: batch,
+      skipDuplicates: true,
     });
-    upserted += 1;
-
-    if (upserted % 500 === 0) {
-      console.log(`  ${upserted}/${entries.length} catalog entries upserted...`);
-    }
+    inserted += result.count;
+    console.log(
+      `  Batch ${Math.floor(i / BATCH_SIZE) + 1}: ${result.count} new rows inserted (${i + batch.length}/${entries.length} processed)`
+    );
   }
 
   const total = await prisma.catalogItem.count();
-  console.log(`\nSeed complete. ${upserted} entries upserted. catalog_items now has ${total} rows.`);
+  console.log(`\nSeed complete. ${inserted} new rows inserted. catalog_items now has ${total} rows.`);
 }
 
 main()
