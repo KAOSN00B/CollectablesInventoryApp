@@ -70,6 +70,7 @@ class AddEditWishlistFragment : Fragment() {
                     binding.targetPriceInput.setText(item.targetPrice.toString())
                     binding.currentMarketPriceInput.setText(item.currentEstimatedValue.toString())
                     binding.notesInput.setText(item.notes ?: "")
+                    binding.grailSwitch.isChecked = item.isGrail
                 }
             } catch (exception: Exception) {
                 findNavController().popBackStack()
@@ -100,7 +101,7 @@ class AddEditWishlistFragment : Fragment() {
                             targetPrice = targetPrice,
                             currentEstimatedValue = currentEstimatedValue,
                             notes = notes,
-                            isGrail = false
+                            isGrail = binding.grailSwitch.isChecked
                         )
                     )
                 } else {
@@ -111,7 +112,7 @@ class AddEditWishlistFragment : Fragment() {
                             targetPrice = targetPrice,
                             currentEstimatedValue = currentEstimatedValue,
                             notes = notes,
-                            isGrail = existingItem!!.isGrail
+                            isGrail = binding.grailSwitch.isChecked
                         )
                     )
                 }

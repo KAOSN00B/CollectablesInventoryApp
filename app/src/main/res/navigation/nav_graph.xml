@@ -6,6 +6,7 @@
 
     <action android:id="@+id/action_global_barcodeScan" app:destination="@id/barcodeScanFragment" />
     <action android:id="@+id/action_global_aiIdentify" app:destination="@id/aiIdentifyFragment" />
+    <action android:id="@+id/action_global_photoScan" app:destination="@id/photoScanFragment" />
     <action android:id="@+id/action_global_search" app:destination="@id/priceCheckFragment" />
     <action android:id="@+id/action_global_addGame" app:destination="@id/addEditGameFragment" />
     <action android:id="@+id/action_global_addConsole" app:destination="@id/addEditConsoleFragment" />
@@ -142,6 +143,13 @@
         <action android:id="@+id/action_aiIdentify_to_addEditGame" app:destination="@id/addEditGameFragment" />
         <action android:id="@+id/action_aiIdentify_to_addEditConsole" app:destination="@id/addEditConsoleFragment" />
         <action android:id="@+id/action_aiIdentify_to_addEditCollectible" app:destination="@id/addEditCollectibleFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/photoScanFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.smart_add.PhotoScanFragment"
+        android:label="Scan by Photo">
+        <action android:id="@+id/action_photoScan_to_addEditGame" app:destination="@id/addEditGameFragment" />
     </fragment>
 
 </navigation>

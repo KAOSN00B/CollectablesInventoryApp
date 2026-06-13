@@ -40,6 +40,11 @@ class SmartAddBottomSheet : BottomSheetDialogFragment() {
             findNavController().navigate(R.id.action_global_barcodeScan)
         }
 
+        binding.optionPhotoScan.setOnClickListener {
+            dismiss()
+            findNavController().navigate(R.id.action_global_photoScan)
+        }
+
         binding.optionAiIdentify.setOnClickListener {
             dismiss()
             findNavController().navigate(R.id.action_global_aiIdentify)

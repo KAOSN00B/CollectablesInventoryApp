@@ -19,19 +19,20 @@ import androidx.navigation.fragment.findNavController
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import com.lasallecollegevancouver.gameinventoryapp.R
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentBarcodeScanBinding
-import com.lasallecollegevancouver.gameinventoryapp.network.PriceChartingRepository
+import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 // Full-screen camera preview that scans for barcodes using ML Kit
-// On a successful scan, looks up the UPC on PriceCharting and navigates to the add form
+// On a successful scan, looks up the UPC in the CollectOS catalog and navigates to the add form
 class BarcodeScanFragment : Fragment() {
 
     private var _binding: FragmentBarcodeScanBinding? = null
     private val binding get() = _binding!!
 
-    private val priceChartingRepository = PriceChartingRepository()
+    private val repository = CollectOsRepository()
     private val cameraExecutor = Executors.newSingleThreadExecutor()
 
     // Prevents multiple scans from firing at the same time
@@ -61,7 +62,6 @@ class BarcodeScanFragment : Fragment() {
 
         binding.cancelButton.setOnClickListener { findNavController().popBackStack() }
 
-        // Check for camera permission before starting the preview
         if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED) {
             startCamera()
@@ -76,12 +76,10 @@ class BarcodeScanFragment : Fragment() {
         cameraProviderFuture.addListener({
             val cameraProvider = cameraProviderFuture.get()
 
-            // Preview — shows what the camera sees in the PreviewView
             val preview = Preview.Builder().build().also { previewUseCase ->
                 previewUseCase.setSurfaceProvider(binding.cameraPreview.surfaceProvider)
             }
 
-            // ImageAnalysis — passes frames to the ML Kit barcode scanner
             val imageAnalysis = ImageAnalysis.Builder()
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
@@ -133,27 +131,26 @@ class BarcodeScanFragment : Fragment() {
             .addOnCompleteListener { imageProxy.close() }
     }
 
-    // Called when a valid barcode is detected — looks it up on PriceCharting
+    // Called when a valid barcode is detected — looks it up in the CollectOS catalog
     private fun onBarcodeDetected(upc: String) {
-        binding.scanStatusText.text = "Found barcode: $upc\nLooking up price..."
+        binding.scanStatusText.text = "Found barcode: $upc\nSearching catalog..."
         binding.scanStatusText.visibility = View.VISIBLE
 
         lifecycleScope.launch {
-            val product = priceChartingRepository.searchByBarcode(upc)
-            if (product != null) {
-                // Pass the found product data to the add game form via a Bundle
+            val item = repository.lookupBarcode(upc)
+            if (item != null) {
+                // Pass catalog data to the add game form — same bundle shape as text search
                 val bundle = Bundle().apply {
-                    putString("prefillTitle", product.productName)
-                    putString("prefillPlatform", product.consoleName ?: "")
-                    putInt("prefillPriceChartingId", product.id)
-                    putDouble("prefillEstimatedValue", product.bestPrice())
+                    putString("prefillTitle", item.title)
+                    putString("prefillPlatform", item.platform)
+                    putInt("prefillCatalogItemId", item.id)
+                    putDouble("prefillLooseValue", item.looseValue)
+                    putDouble("prefillCibValue", item.cibValue)
+                    putDouble("prefillNewValue", item.newValue)
                 }
-                findNavController().navigate(
-                    com.lasallecollegevancouver.gameinventoryapp.R.id.action_barcodeScan_to_addEditGame,
-                    bundle
-                )
+                findNavController().navigate(R.id.action_barcodeScan_to_addEditGame, bundle)
             } else {
-                binding.scanStatusText.text = "No results found for barcode: $upc\nTry manual entry."
+                binding.scanStatusText.text = "No catalog match for barcode: $upc\nTry searching by name instead."
                 // Allow scanning again after a failed lookup
                 isScanHandled = false
             }

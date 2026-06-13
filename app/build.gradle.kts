@@ -86,8 +86,9 @@ dependencies {
     implementation(libs.camera.lifecycle)
     implementation(libs.camera.view)
 
-    // ML Kit — barcode scanning from the camera feed
+    // ML Kit — barcode scanning and photo OCR
     implementation(libs.mlkit.barcode)
+    implementation(libs.mlkit.text.recognition)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
