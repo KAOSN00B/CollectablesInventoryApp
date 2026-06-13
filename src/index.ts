@@ -1,6 +1,8 @@
 import "dotenv/config";
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import prisma from "./lib/prisma";
 import collectionsRouter from "./routes/collections";
 import catalogRouter from "./routes/catalog";
@@ -8,6 +10,27 @@ import publicRouter from "./routes/public";
 
 const app = express();
 const PORT = process.env.PORT ?? 3000;
+
+// Security headers — sets X-Frame-Options, X-Content-Type-Options, CSP, HSTS, etc.
+app.use(helmet());
+
+// Global rate limit — 100 requests per 15 minutes per IP
+const globalRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use(globalRateLimit);
+
+// Stricter rate limit on search — pg_trgm queries are expensive
+const searchRateLimit = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use("/catalog/search", searchRateLimit);
 
 app.use(cors());
 app.use(express.json());
@@ -37,6 +60,12 @@ async function startServer() {
     console.log(`CollectOS backend running on port ${PORT}`);
   });
 }
+
+// Global error handler — must have 4 params so Express recognizes it as error middleware
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error(err);
+  res.status(500).json({ error: "Internal server error" });
+});
 
 startServer().catch((error) => {
   console.error("Failed to start server:", error);

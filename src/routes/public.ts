@@ -1,10 +1,11 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import prisma from "../lib/prisma";
 
 const router = Router();
 
 // GET /c/:code — public read-only collection page (plain HTML, no React needed)
-router.get("/:code", async (req: Request, res: Response) => {
+router.get("/:code", async (req: Request, res: Response, next: NextFunction) => {
+  try {
   const code = String(req.params.code).toUpperCase();
 
   const collection = await prisma.collection.findUnique({
@@ -182,6 +183,9 @@ router.get("/:code", async (req: Request, res: Response) => {
     </body>
     </html>
   `);
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Prevent XSS in user-supplied strings rendered into HTML
