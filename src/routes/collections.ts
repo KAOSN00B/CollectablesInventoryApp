@@ -26,6 +26,7 @@ const addItemSchema = z
     tcgIsFoil: z.boolean().optional().nullable(),
     tcgExternalId: z.string().optional().nullable(),
     quantity: z.number().int().min(1).optional().nullable(),
+    binderId: z.number().int().positive().optional().nullable(),
   })
   .superRefine((data, ctx) => {
     // Enforce the correct condition scale per item type
@@ -169,7 +170,7 @@ router.post("/:code/items", async (req: Request, res: Response, next: NextFuncti
       catalogItemId, type, title, platform, condition,
       purchasePrice, estimatedValue, notes, forTrade,
       tcgGame, tcgSet, tcgSetCode, tcgCardNumber, tcgRarity,
-      tcgIsFoil, tcgExternalId, quantity,
+      tcgIsFoil, tcgExternalId, quantity, binderId,
     } = parsed.data;
 
     const item = await prisma.collectionItem.create({
@@ -194,6 +195,18 @@ router.post("/:code/items", async (req: Request, res: Response, next: NextFuncti
         quantity: quantity ?? null,
       },
     });
+
+    // If the caller provided a binder ID, assign this item to that binder
+    if (binderId) {
+      const binder = await prisma.binder.findFirst({
+        where: { id: binderId, collectionId: collection.id },
+      });
+      if (binder) {
+        await prisma.binderItem.create({
+          data: { binderId, collectionItemId: item.id },
+        });
+      }
+    }
 
     res.status(201).json(item);
   } catch (err) {
@@ -424,6 +437,224 @@ router.delete("/:code/wishlist/:id", async (req: Request, res: Response, next: N
     }
 
     await prisma.wishlistItem.delete({ where: { id: itemId } });
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ---------- BINDERS ----------
+
+// GET /collections/:code/binders — list binders with item count and total value
+router.get("/:code/binders", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const code = String(req.params.code).toUpperCase();
+
+    const collection = await prisma.collection.findUnique({
+      where: { publicCode: code },
+    });
+    if (!collection) {
+      res.status(404).json({ error: "Collection not found" });
+      return;
+    }
+
+    const binders = await prisma.binder.findMany({
+      where: { collectionId: collection.id },
+      orderBy: { createdAt: "asc" },
+      include: {
+        items: {
+          include: { collectionItem: true },
+        },
+      },
+    });
+
+    // Compute item count and total value for each binder
+    const bindersWithStats = binders.map((binder) => ({
+      id: binder.id,
+      collectionId: binder.collectionId,
+      name: binder.name,
+      createdAt: binder.createdAt,
+      itemCount: binder.items.length,
+      totalValue: binder.items.reduce((sum, bi) => {
+        const item = bi.collectionItem;
+        const qty = item.quantity ?? 1;
+        return sum + item.estimatedValue * qty;
+      }, 0),
+    }));
+
+    res.json(bindersWithStats);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /collections/:code/binders — create a new binder
+router.post("/:code/binders", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const code = String(req.params.code).toUpperCase();
+    const { name } = req.body as { name?: string };
+
+    if (!name || name.trim().length === 0) {
+      res.status(400).json({ error: "Binder name is required" });
+      return;
+    }
+
+    const collection = await prisma.collection.findUnique({
+      where: { publicCode: code },
+    });
+    if (!collection) {
+      res.status(404).json({ error: "Collection not found" });
+      return;
+    }
+
+    const binder = await prisma.binder.create({
+      data: { collectionId: collection.id, name: name.trim() },
+    });
+
+    res.status(201).json({ ...binder, itemCount: 0, totalValue: 0 });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /collections/:code/binders/:id — get one binder with all its items
+router.get("/:code/binders/:id", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const code = String(req.params.code).toUpperCase();
+    const binderId = parseInt(String(req.params.id), 10);
+
+    const collection = await prisma.collection.findUnique({
+      where: { publicCode: code },
+    });
+    if (!collection) {
+      res.status(404).json({ error: "Collection not found" });
+      return;
+    }
+
+    const binder = await prisma.binder.findFirst({
+      where: { id: binderId, collectionId: collection.id },
+      include: {
+        items: {
+          include: { collectionItem: true },
+          orderBy: { collectionItem: { createdAt: "desc" } },
+        },
+      },
+    });
+    if (!binder) {
+      res.status(404).json({ error: "Binder not found" });
+      return;
+    }
+
+    res.json({
+      id: binder.id,
+      collectionId: binder.collectionId,
+      name: binder.name,
+      createdAt: binder.createdAt,
+      items: binder.items.map((bi) => bi.collectionItem),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /collections/:code/binders/:id — delete a binder (items stay in collection)
+router.delete("/:code/binders/:id", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const code = String(req.params.code).toUpperCase();
+    const binderId = parseInt(String(req.params.id), 10);
+
+    const collection = await prisma.collection.findUnique({
+      where: { publicCode: code },
+    });
+    if (!collection) {
+      res.status(404).json({ error: "Collection not found" });
+      return;
+    }
+
+    const binder = await prisma.binder.findFirst({
+      where: { id: binderId, collectionId: collection.id },
+    });
+    if (!binder) {
+      res.status(404).json({ error: "Binder not found" });
+      return;
+    }
+
+    // Deleting the binder cascades to binder_items; the collection items themselves are untouched
+    await prisma.binder.delete({ where: { id: binderId } });
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /collections/:code/binders/:id/items — add an existing item to a binder
+router.post("/:code/binders/:id/items", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const code = String(req.params.code).toUpperCase();
+    const binderId = parseInt(String(req.params.id), 10);
+    const { itemId } = req.body as { itemId?: number };
+
+    if (!itemId) {
+      res.status(400).json({ error: "itemId is required" });
+      return;
+    }
+
+    const collection = await prisma.collection.findUnique({
+      where: { publicCode: code },
+    });
+    if (!collection) {
+      res.status(404).json({ error: "Collection not found" });
+      return;
+    }
+
+    const binder = await prisma.binder.findFirst({
+      where: { id: binderId, collectionId: collection.id },
+    });
+    if (!binder) {
+      res.status(404).json({ error: "Binder not found" });
+      return;
+    }
+
+    const item = await prisma.collectionItem.findFirst({
+      where: { id: itemId, collectionId: collection.id },
+    });
+    if (!item) {
+      res.status(404).json({ error: "Item not found in this collection" });
+      return;
+    }
+
+    // upsert so adding the same item twice is idempotent
+    await prisma.binderItem.upsert({
+      where: { binderId_collectionItemId: { binderId, collectionItemId: itemId } },
+      create: { binderId, collectionItemId: itemId },
+      update: {},
+    });
+
+    res.status(201).json({ binderId, collectionItemId: itemId });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /collections/:code/binders/:id/items/:itemId — remove item from binder
+router.delete("/:code/binders/:id/items/:itemId", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const code = String(req.params.code).toUpperCase();
+    const binderId = parseInt(String(req.params.id), 10);
+    const itemId = parseInt(String(req.params.itemId), 10);
+
+    const collection = await prisma.collection.findUnique({
+      where: { publicCode: code },
+    });
+    if (!collection) {
+      res.status(404).json({ error: "Collection not found" });
+      return;
+    }
+
+    await prisma.binderItem.deleteMany({
+      where: { binderId, collectionItemId: itemId },
+    });
+
     res.status(204).send();
   } catch (err) {
     next(err);

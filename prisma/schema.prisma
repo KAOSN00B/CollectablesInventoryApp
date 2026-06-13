@@ -14,6 +14,7 @@ model Collection {
 
   items    CollectionItem[]
   wishlist WishlistItem[]
+  binders  Binder[]
 
   @@map("collections")
 }
@@ -64,10 +65,35 @@ model CollectionItem {
   tcgExternalId String?  // Scryfall UUID, PokémonTCG card ID, or YGOPro card ID
   quantity      Int?     // how many copies owned (players often have 4x of a card)
 
-  collection  Collection   @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  catalogItem CatalogItem? @relation(fields: [catalogItemId], references: [id])
+  collection   Collection   @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  catalogItem  CatalogItem? @relation(fields: [catalogItemId], references: [id])
+  binderItems  BinderItem[]
 
   @@map("collection_items")
+}
+
+model Binder {
+  id           Int        @id @default(autoincrement())
+  collectionId Int
+  name         String
+  createdAt    DateTime   @default(now())
+
+  collection Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  items      BinderItem[]
+
+  @@map("binders")
+}
+
+// Junction table — one item can belong to many binders
+model BinderItem {
+  binderId         Int
+  collectionItemId Int
+
+  binder         Binder         @relation(fields: [binderId], references: [id], onDelete: Cascade)
+  collectionItem CollectionItem @relation(fields: [collectionItemId], references: [id], onDelete: Cascade)
+
+  @@id([binderId, collectionItemId])
+  @@map("binder_items")
 }
 
 model WishlistItem {
