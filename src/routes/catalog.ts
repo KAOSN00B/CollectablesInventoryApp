@@ -32,7 +32,7 @@ router.get("/search", async (req: Request, res: Response, next: NextFunction) =>
             "searchableText" ILIKE ${searchPattern}
             OR word_similarity(${query}, title) > 0.3
           )
-        ORDER BY word_similarity(${query}, title) DESC
+        ORDER BY word_similarity(${query}, "searchableText") DESC, word_similarity(${query}, title) DESC
         LIMIT ${limit}
       `;
     } else {
@@ -43,7 +43,7 @@ router.get("/search", async (req: Request, res: Response, next: NextFunction) =>
         FROM catalog_items
         WHERE "searchableText" ILIKE ${searchPattern}
            OR word_similarity(${query}, title) > 0.3
-        ORDER BY word_similarity(${query}, title) DESC
+        ORDER BY word_similarity(${query}, "searchableText") DESC, word_similarity(${query}, title) DESC
         LIMIT ${limit}
       `;
     }

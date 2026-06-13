@@ -1,21 +1,28 @@
-﻿const fs = require('fs');
+const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
 const ROOT = path.join(__dirname, '..');
 const OUT_DIR = path.join(ROOT, 'prisma', 'seed-data', 'games');
-const TARGET = 400;
+const TARGET = 800;
 
 const platforms = [
   { file: 'switch.json', platform: 'Switch', pages: ['List of Nintendo Switch games (0-9)', 'List of Nintendo Switch games (A-Am)', 'List of Nintendo Switch games (An-Az)', 'List of Nintendo Switch games (B)', 'List of Nintendo Switch games (C-G)', 'List of Nintendo Switch games (H-P)', 'List of Nintendo Switch games (Q-Z)'] },
   { file: 'ps5.json', platform: 'PS5', pages: ['List of PlayStation 5 games'] },
   { file: 'ps4.json', platform: 'PS4', pages: ['List of PlayStation 4 games (A–L)', 'List of PlayStation 4 games (M–Z)'] },
+  { file: 'ps3.json', platform: 'PS3', pages: ['List of PlayStation 3 games (A–C)', 'List of PlayStation 3 games (D–I)', 'List of PlayStation 3 games (J–P)', 'List of PlayStation 3 games (Q–Z)'] },
   { file: 'ps2.json', platform: 'PS2', pages: ['List of PlayStation 2 games (A–K)', 'List of PlayStation 2 games (L–Z)'] },
   { file: 'ps1.json', platform: 'PS1', pages: ['List of PlayStation (console) games (A–L)', 'List of PlayStation (console) games (M–Z)'] },
+  { file: 'psp.json', platform: 'PSP', pages: ['List of PlayStation Portable games'] },
+  { file: 'xbox_360.json', platform: 'Xbox 360', pages: ['List of Xbox 360 games (A–L)', 'List of Xbox 360 games (M–Z)'] },
   { file: 'xbox.json', platform: 'Xbox', pages: ['List of Xbox games'] },
+  { file: 'wii.json', platform: 'Wii', pages: ['List of Wii games'] },
   { file: 'gamecube.json', platform: 'GameCube', pages: ['List of GameCube games'] },
   { file: 'gba.json', platform: 'GBA', pages: ['List of Game Boy Advance games'] },
+  { file: 'ds.json', platform: 'DS', pages: ['List of Nintendo DS games (0–C)', 'List of Nintendo DS games (D–I)', 'List of Nintendo DS games (J–P)', 'List of Nintendo DS games (Q–Z)'] },
+  { file: '3ds.json', platform: '3DS', pages: ['List of Nintendo 3DS games (0–M)', 'List of Nintendo 3DS games (N–Z)'] },
   { file: 'n64.json', platform: 'N64', pages: ['List of Nintendo 64 games'] },
+  { file: 'nes.json', platform: 'NES', pages: ['List of Nintendo Entertainment System games'] },
   { file: 'snes.json', platform: 'SNES', pages: ['List of Super Nintendo Entertainment System games'] },
   { file: 'genesis.json', platform: 'Genesis', pages: ['List of Sega Genesis games'] },
   { file: 'dreamcast.json', platform: 'Dreamcast', pages: ['List of Dreamcast games'] },
@@ -36,17 +43,17 @@ const popularTerms = ['Mario', 'Zelda', 'Pokemon', 'Metroid', 'Kirby', 'Fire Emb
 
 const franchiseGenres = [
   [/Pokemon|Dragon Quest|Final Fantasy|Persona|Shin Megami|Xenoblade|Tales of|Ys |Suikoden|Chrono|EarthBound|Golden Sun|Fire Emblem|Disgaea|Star Ocean|Kingdom Hearts|Ni no Kuni|Octopath|Bravely|Phantasy Star|Xenosaga|Lunar/i, 'RPG'],
-  [/Zelda|Metroid|Castlevania|Okami|Ico|Shadow of the Colossus|Tomb Raider|Uncharted|God of War|Metal Gear|Assassin|Darksiders|Bayonetta|Devil May Cry|Ninja Gaiden/i, 'Action-Adventure'],
+  [/Zelda|Metroid|Castlevania|Okami|Ico|Shadow of the Colossus|Tomb Raider|Uncharted|God of War|Metal Gear|Assassin|Darksiders|Bayonetta|Devil May Cry|Ninja Gaiden/i, 'Adventure'],
   [/Mario|Sonic|Kirby|Crash|Spyro|Rayman|Mega Man|Donkey Kong|Yoshi|Banjo|Klonoa|Shantae|Wario Land|Ape Escape|LittleBigPlanet|Ratchet|Sly Cooper/i, 'Platformer'],
-  [/Resident Evil|Silent Hill|Fatal Frame|Dino Crisis|Outlast|Until Dawn|Alan Wake|Dead Space|Evil Within|Clock Tower|Alone in the Dark|Rule of Rose|Haunting Ground|Kuon/i, 'Survival Horror'],
+  [/Resident Evil|Silent Hill|Fatal Frame|Dino Crisis|Outlast|Until Dawn|Alan Wake|Dead Space|Evil Within|Clock Tower|Alone in the Dark|Rule of Rose|Haunting Ground|Kuon/i, 'Horror'],
   [/Street Fighter|Tekken|Mortal Kombat|Soulcalibur|King of Fighters|Guilty Gear|BlazBlue|Marvel vs|Capcom vs|Smash|Virtua Fighter|Dead or Alive|Killer Instinct|Power Stone/i, 'Fighting'],
   [/Halo|Call of Duty|Doom|Quake|Wolfenstein|Battlefield|Gears of War|Killzone|Resistance|BioShock|Borderlands|Destiny|Splatoon|Perfect Dark|GoldenEye|Half-Life|Far Cry/i, 'Shooter'],
   [/Advance Wars|Civilization|XCOM|Ogre Battle|Tactics|Command & Conquer|Warcraft|StarCraft|Pikmin|Triangle Strategy|Valkyria/i, 'Strategy'],
   [/Mario Kart|Gran Turismo|Forza|Need for Speed|Burnout|F-Zero|Ridge Racer|Wipeout|Diddy Kong Racing|Crash Team Racing|Crazy Taxi|Wave Race/i, 'Racing'],
   [/Animal Crossing|Harvest Moon|Story of Seasons|Stardew|The Sims|SimCity|RollerCoaster|Theme Park|Nintendogs|Seaman/i, 'Simulation'],
   [/Tetris|Puyo|Dr. Mario|Puzzle|Picross|Lumines|Professor Layton|Meteos/i, 'Puzzle'],
-  [/Guitar Hero|Rock Band|Dance Dance|Just Dance|PaRappa|Rhythm|Elite Beat|Beat Saber|Taiko/i, 'Rhythm'],
-  [/Minecraft|Terraria|Roblox|Dreams/i, 'Sandbox']
+  [/Guitar Hero|Rock Band|Dance Dance|Just Dance|PaRappa|Rhythm|Elite Beat|Beat Saber|Taiko/i, 'Simulation'],
+  [/Minecraft|Terraria|Roblox|Dreams/i, 'Simulation']
 ];
 
 function sleep(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }

@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import * as fs from "fs";
 import * as path from "path";
@@ -51,25 +51,74 @@ function loadCatalogEntries(seedDir: string): CatalogEntry[] {
 
 const BATCH_SIZE = 500;
 
+async function pruneUnreferencedGameCatalogRows() {
+  const deleted = await prisma.$executeRaw`
+    DELETE FROM catalog_items ci
+    WHERE ci.type = 'GAME'
+      AND NOT EXISTS (
+        SELECT 1 FROM collection_items collection_item
+        WHERE collection_item."catalogItemId" = ci.id
+      )
+      AND NOT EXISTS (
+        SELECT 1 FROM wishlist_items wishlist_item
+        WHERE wishlist_item."catalogItemId" = ci.id
+      )
+  `;
+
+  console.log(`Pruned ${deleted} unreferenced GAME catalog rows before reseeding.`);
+}
+
+async function bulkUpsertCatalogEntries(entries: CatalogEntry[]) {
+  let affected = 0;
+
+  for (let i = 0; i < entries.length; i += BATCH_SIZE) {
+    const batch = entries.slice(i, i + BATCH_SIZE);
+    const rows = batch.map((entry) => Prisma.sql`(
+      ${entry.type},
+      ${entry.title},
+      ${entry.platform},
+      ${entry.upc},
+      ${entry.looseValue},
+      ${entry.cibValue},
+      ${entry.newValue},
+      ${entry.genre},
+      ${entry.releaseYear},
+      ${entry.searchableText}
+    )`);
+
+    const result = await prisma.$executeRaw`
+      INSERT INTO catalog_items
+        (type, title, platform, upc, "looseValue", "cibValue", "newValue", genre, "releaseYear", "searchableText")
+      VALUES ${Prisma.join(rows)}
+      ON CONFLICT (title, platform) DO UPDATE SET
+        type = EXCLUDED.type,
+        upc = EXCLUDED.upc,
+        "looseValue" = EXCLUDED."looseValue",
+        "cibValue" = EXCLUDED."cibValue",
+        "newValue" = EXCLUDED."newValue",
+        genre = EXCLUDED.genre,
+        "releaseYear" = EXCLUDED."releaseYear",
+        "searchableText" = EXCLUDED."searchableText"
+    `;
+
+    affected += result;
+    console.log(
+      `  Batch ${Math.floor(i / BATCH_SIZE) + 1}: ${result} rows inserted/updated (${i + batch.length}/${entries.length} processed)`
+    );
+  }
+
+  return affected;
+}
+
 async function main() {
   const seedDir = path.join(__dirname, "seed-data", "games");
   const entries = loadCatalogEntries(seedDir);
 
-  let inserted = 0;
-  for (let i = 0; i < entries.length; i += BATCH_SIZE) {
-    const batch = entries.slice(i, i + BATCH_SIZE);
-    const result = await prisma.catalogItem.createMany({
-      data: batch,
-      skipDuplicates: true,
-    });
-    inserted += result.count;
-    console.log(
-      `  Batch ${Math.floor(i / BATCH_SIZE) + 1}: ${result.count} new rows inserted (${i + batch.length}/${entries.length} processed)`
-    );
-  }
+  await pruneUnreferencedGameCatalogRows();
+  const affected = await bulkUpsertCatalogEntries(entries);
 
   const total = await prisma.catalogItem.count();
-  console.log(`\nSeed complete. ${inserted} new rows inserted. catalog_items now has ${total} rows.`);
+  console.log(`\nSeed complete. ${affected} catalog rows inserted/updated. catalog_items now has ${total} rows.`);
 }
 
 main()
