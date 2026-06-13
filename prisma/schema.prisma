@@ -43,16 +43,26 @@ model CollectionItem {
   id             Int      @id @default(autoincrement())
   collectionId   Int
   catalogItemId  Int?
-  type           String   // "GAME" or "CONSOLE"
+  type           String   // "GAME", "CONSOLE", "TCG", "COLLECTIBLE"
   title          String
-  platform       String
-  condition      String   // "LOOSE", "CIB", "NEW", "POOR"
+  platform       String   // for TCG this stores the set name
+  condition      String   // LOOSE/CIB/NEW/POOR for games; NM/LP/MP/HP/DMG for TCG
   purchasePrice  Float    @default(0)
   estimatedValue Float    @default(0)
   notes          String?
   forTrade       Boolean  @default(false)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  // TCG-specific fields — null for all game/console rows
+  tcgGame       String?  // "MTG" | "POKEMON" | "YUGIOH"
+  tcgSet        String?  // "Scarlet & Violet Base Set"
+  tcgSetCode    String?  // "SVP" — used to re-fetch prices from the API later
+  tcgCardNumber String?  // "001/250"
+  tcgRarity     String?  // "Rare Holo", "Mythic Rare", "Common"
+  tcgIsFoil     Boolean? // foil/holo variant — worth significantly more than non-foil
+  tcgExternalId String?  // Scryfall UUID, PokémonTCG card ID, or YGOPro card ID
+  quantity      Int?     // how many copies owned (players often have 4x of a card)
 
   collection  Collection   @relation(fields: [collectionId], references: [id], onDelete: Cascade)
   catalogItem CatalogItem? @relation(fields: [catalogItemId], references: [id])

@@ -2,25 +2,61 @@ import { Router, Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import prisma from "../lib/prisma";
 
+const GAME_CONDITIONS = ["LOOSE", "CIB", "NEW", "POOR"] as const;
+const TCG_CONDITIONS = ["NM", "LP", "MP", "HP", "DMG"] as const;
+
 // Zod schemas for write endpoints
-const addItemSchema = z.object({
-  catalogItemId: z.number().int().positive().optional().nullable(),
-  type: z.enum(["GAME", "CONSOLE"]),
-  title: z.string().min(1, "Title is required"),
-  platform: z.string().min(1, "Platform is required"),
-  condition: z.enum(["LOOSE", "CIB", "NEW", "POOR"]),
-  purchasePrice: z.number().min(0).optional(),
-  estimatedValue: z.number().min(0).optional(),
-  notes: z.string().optional().nullable(),
-  forTrade: z.boolean().optional(),
-});
+const addItemSchema = z
+  .object({
+    catalogItemId: z.number().int().positive().optional().nullable(),
+    type: z.enum(["GAME", "CONSOLE", "TCG", "COLLECTIBLE"]),
+    title: z.string().min(1, "Title is required"),
+    platform: z.string().min(1, "Platform is required"),
+    condition: z.string().min(1, "Condition is required"),
+    purchasePrice: z.number().min(0).optional(),
+    estimatedValue: z.number().min(0).optional(),
+    notes: z.string().optional().nullable(),
+    forTrade: z.boolean().optional(),
+    // TCG-specific fields — omitted for game/console items
+    tcgGame: z.enum(["MTG", "POKEMON", "YUGIOH"]).optional().nullable(),
+    tcgSet: z.string().optional().nullable(),
+    tcgSetCode: z.string().optional().nullable(),
+    tcgCardNumber: z.string().optional().nullable(),
+    tcgRarity: z.string().optional().nullable(),
+    tcgIsFoil: z.boolean().optional().nullable(),
+    tcgExternalId: z.string().optional().nullable(),
+    quantity: z.number().int().min(1).optional().nullable(),
+  })
+  .superRefine((data, ctx) => {
+    // Enforce the correct condition scale per item type
+    if (data.type === "GAME" || data.type === "CONSOLE") {
+      if (!GAME_CONDITIONS.includes(data.condition as typeof GAME_CONDITIONS[number])) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `For type ${data.type}, condition must be one of: ${GAME_CONDITIONS.join(", ")}`,
+          path: ["condition"],
+        });
+      }
+    } else if (data.type === "TCG") {
+      if (!TCG_CONDITIONS.includes(data.condition as typeof TCG_CONDITIONS[number])) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `For type TCG, condition must be one of: ${TCG_CONDITIONS.join(", ")}`,
+          path: ["condition"],
+        });
+      }
+    }
+    // COLLECTIBLE: no condition restriction
+  });
 
 const updateItemSchema = z.object({
-  condition: z.enum(["LOOSE", "CIB", "NEW", "POOR"]).optional(),
+  condition: z.string().optional(),
   purchasePrice: z.number().min(0).optional(),
   estimatedValue: z.number().min(0).optional(),
   notes: z.string().optional().nullable(),
   forTrade: z.boolean().optional(),
+  tcgIsFoil: z.boolean().optional().nullable(),
+  quantity: z.number().int().min(1).optional().nullable(),
 });
 
 const router = Router();
@@ -129,7 +165,12 @@ router.post("/:code/items", async (req: Request, res: Response, next: NextFuncti
       return;
     }
 
-    const { catalogItemId, type, title, platform, condition, purchasePrice, estimatedValue, notes, forTrade } = parsed.data;
+    const {
+      catalogItemId, type, title, platform, condition,
+      purchasePrice, estimatedValue, notes, forTrade,
+      tcgGame, tcgSet, tcgSetCode, tcgCardNumber, tcgRarity,
+      tcgIsFoil, tcgExternalId, quantity,
+    } = parsed.data;
 
     const item = await prisma.collectionItem.create({
       data: {
@@ -143,6 +184,14 @@ router.post("/:code/items", async (req: Request, res: Response, next: NextFuncti
         estimatedValue: estimatedValue ?? 0,
         notes: notes ?? null,
         forTrade: forTrade ?? false,
+        tcgGame: tcgGame ?? null,
+        tcgSet: tcgSet ?? null,
+        tcgSetCode: tcgSetCode ?? null,
+        tcgCardNumber: tcgCardNumber ?? null,
+        tcgRarity: tcgRarity ?? null,
+        tcgIsFoil: tcgIsFoil ?? null,
+        tcgExternalId: tcgExternalId ?? null,
+        quantity: quantity ?? null,
       },
     });
 
@@ -180,7 +229,7 @@ router.put("/:code/items/:id", async (req: Request, res: Response, next: NextFun
       return;
     }
 
-    const { condition, purchasePrice, estimatedValue, notes, forTrade } = parsed.data;
+    const { condition, purchasePrice, estimatedValue, notes, forTrade, tcgIsFoil, quantity } = parsed.data;
 
     const updated = await prisma.collectionItem.update({
       where: { id: itemId },
@@ -190,6 +239,8 @@ router.put("/:code/items/:id", async (req: Request, res: Response, next: NextFun
         estimatedValue: estimatedValue ?? existing.estimatedValue,
         notes: notes !== undefined ? notes : existing.notes,
         forTrade: forTrade !== undefined ? forTrade : existing.forTrade,
+        tcgIsFoil: tcgIsFoil !== undefined ? tcgIsFoil : existing.tcgIsFoil,
+        quantity: quantity !== undefined ? quantity : existing.quantity,
       },
     });
 
