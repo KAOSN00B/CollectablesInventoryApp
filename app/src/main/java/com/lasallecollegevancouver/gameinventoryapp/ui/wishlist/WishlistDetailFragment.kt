@@ -18,44 +18,39 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.lasallecollegevancouver.gameinventoryapp.R
-import com.lasallecollegevancouver.gameinventoryapp.data.AppDatabase
-import com.lasallecollegevancouver.gameinventoryapp.data.Game
-import com.lasallecollegevancouver.gameinventoryapp.data.WishlistItem
+import com.lasallecollegevancouver.gameinventoryapp.config.PrefsHelper
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentWishlistDetailBinding
+import com.lasallecollegevancouver.gameinventoryapp.network.AddItemRequest
+import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
+import com.lasallecollegevancouver.gameinventoryapp.network.WishlistItem
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class WishlistDetailFragment : Fragment() {
 
     private var _binding: FragmentWishlistDetailBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var database: AppDatabase
+    private val repository = CollectOsRepository()
     private var currentItem: WishlistItem? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentWishlistDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        database = AppDatabase.getInstance(requireContext())
-        setupMenuItems()
+        setupMenu()
         loadItem()
 
-        // Add to Collection — converts the wishlist item into a real Game entry
+        // Move the wishlist item into the main collection as a GAME entry
         binding.addToCollectionButton.setOnClickListener { addToCollection() }
 
-        // Find This Near Me — opens Google Maps with a store search for this specific item
+        // Search for nearby game stores that might carry this title
         binding.findNearMeButton.setOnClickListener { openMapsSearch() }
     }
 
-    private fun setupMenuItems() {
+    private fun setupMenu() {
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -73,62 +68,67 @@ class WishlistDetailFragment : Fragment() {
 
     private fun loadItem() {
         val itemId = arguments?.getInt("wishlistItemId", -1) ?: -1
-        if (itemId == -1) { findNavController().popBackStack(); return }
+        val publicCode = PrefsHelper.getPublicCode(requireContext())
+        if (itemId == -1 || publicCode == null) { findNavController().popBackStack(); return }
+
         lifecycleScope.launch {
-            currentItem = database.wishlistDao().getWishlistItemById(itemId)
-            currentItem?.let { displayItem(it) }
+            try {
+                val items = repository.getWishlist(publicCode)
+                currentItem = items.firstOrNull { it.id == itemId }
+                currentItem?.let { displayItem(it) } ?: findNavController().popBackStack()
+            } catch (exception: Exception) {
+                findNavController().popBackStack()
+            }
         }
     }
 
     private fun displayItem(item: WishlistItem) {
-        binding.detailTitle.text = item.title
-        binding.detailType.text = "${item.type} — ${item.platform}"
+        binding.detailTitle.text = "${if (item.isGrail) "★ " else ""}${item.title}"
+        binding.detailType.text = item.platform
         binding.detailTargetPrice.text = "My Target Price: $${String.format("%.2f", item.targetPrice)}"
-        binding.detailMarketPrice.text = "Current Market Price: $${String.format("%.2f", item.currentMarketPrice)}"
-        binding.detailNotes.text = if (item.notes.isNotBlank()) "Notes: ${item.notes}" else ""
-        val dateFormatter = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
-        binding.detailDateAdded.text = "Added to wishlist: ${dateFormatter.format(Date(item.dateAdded))}"
+        binding.detailMarketPrice.text = "Catalog Value: $${String.format("%.2f", item.currentEstimatedValue)}"
+        binding.detailNotes.text = if (!item.notes.isNullOrBlank()) "Notes: ${item.notes}" else ""
+        binding.detailDateAdded.visibility = View.GONE
     }
 
-    // Creates a Game entry from this wishlist item and then deletes the wishlist entry
+    // Adds the wishlist item to the real collection, then removes it from the wishlist
     private fun addToCollection() {
         val item = currentItem ?: return
+        val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
         lifecycleScope.launch {
-            val newGame = Game(
-                title = item.title,
-                platform = item.platform,
-                genre = "Other",
-                condition = "Good",
-                completionStatus = "Not Started",
-                purchasePrice = item.targetPrice,
-                estimatedValue = item.currentMarketPrice,
-                notes = item.notes,
-                priceChartingId = item.priceChartingId
-            )
-            database.gameDao().insertGame(newGame)
-            database.wishlistDao().delete(item)
-            Snackbar.make(requireView(), "${item.title} moved to your Games collection!", Snackbar.LENGTH_LONG).show()
-            findNavController().popBackStack()
+            try {
+                repository.addItem(
+                    publicCode,
+                    AddItemRequest(
+                        catalogItemId = item.catalogItemId,
+                        type = "GAME",
+                        title = item.title,
+                        platform = item.platform,
+                        condition = "LOOSE",
+                        purchasePrice = item.targetPrice,
+                        estimatedValue = item.currentEstimatedValue,
+                        notes = item.notes,
+                        forTrade = false
+                    )
+                )
+                repository.deleteWishlistItem(publicCode, item.id)
+                Snackbar.make(requireView(), "${item.title} moved to your collection!", Snackbar.LENGTH_LONG).show()
+                findNavController().popBackStack()
+            } catch (exception: Exception) {
+                Snackbar.make(requireView(), "Could not move item — check your connection", Snackbar.LENGTH_SHORT).show()
+            }
         }
     }
 
-    // Opens Google Maps with a search for nearby stores that sell this type of item
+    // Opens Google Maps with a search for nearby video game stores
     private fun openMapsSearch() {
         val item = currentItem ?: return
-        val storeType = when (item.type.uppercase()) {
-            "COMIC" -> "comic book stores"
-            "TCG" -> "trading card game stores"
-            "TOY" -> "toy stores"
-            "LEGO" -> "LEGO stores"
-            else -> "video game stores"
-        }
-        val searchQuery = Uri.encode("${item.title} $storeType near me")
+        val searchQuery = Uri.encode("${item.title} video game stores near me")
         val mapsIntent = Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=$searchQuery"))
         mapsIntent.setPackage("com.google.android.apps.maps")
         if (mapsIntent.resolveActivity(requireActivity().packageManager) != null) {
             startActivity(mapsIntent)
         } else {
-            // Fallback to browser if Maps isn't installed
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://maps.google.com/?q=$searchQuery"))
             startActivity(browserIntent)
         }
@@ -149,10 +149,15 @@ class WishlistDetailFragment : Fragment() {
     }
 
     private fun deleteItem() {
-        val itemToDelete = currentItem ?: return
+        val item = currentItem ?: return
+        val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
         lifecycleScope.launch {
-            database.wishlistDao().delete(itemToDelete)
-            findNavController().popBackStack()
+            try {
+                repository.deleteWishlistItem(publicCode, item.id)
+                findNavController().popBackStack()
+            } catch (exception: Exception) {
+                Snackbar.make(requireView(), "Could not delete — check your connection", Snackbar.LENGTH_SHORT).show()
+            }
         }
     }
 

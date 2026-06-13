@@ -16,45 +16,32 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.lasallecollegevancouver.gameinventoryapp.R
-import com.lasallecollegevancouver.gameinventoryapp.data.AppDatabase
-import com.lasallecollegevancouver.gameinventoryapp.data.Console
+import com.lasallecollegevancouver.gameinventoryapp.config.PrefsHelper
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentConsoleDetailBinding
-import com.lasallecollegevancouver.gameinventoryapp.network.PriceChartingRepository
+import com.lasallecollegevancouver.gameinventoryapp.network.CollectionItem
+import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class ConsoleDetailFragment : Fragment() {
 
     private var _binding: FragmentConsoleDetailBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var database: AppDatabase
-    private val priceChartingRepository = PriceChartingRepository()
+    private val repository = CollectOsRepository()
+    private var currentItem: CollectionItem? = null
 
-    // Holds the loaded console so Edit, Delete, and Refresh actions can reference it
-    private var currentConsole: Console? = null
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentConsoleDetailBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        database = AppDatabase.getInstance(requireContext())
-        setupMenuItems()
-        loadConsole()
-
-        // Refresh Market Price — only shown and active when we have a PriceCharting ID
-        binding.refreshPriceButton.setOnClickListener { refreshMarketPrice() }
+        setupMenu()
+        loadItem()
     }
 
-    // Registers Edit and Delete toolbar menu items
-    private fun setupMenuItems() {
+    private fun setupMenu() {
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -70,113 +57,63 @@ class ConsoleDetailFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-    // Reads the consoleId from the Bundle and fetches the matching console from Room
-    private fun loadConsole() {
-        val consoleId = arguments?.getInt("consoleId", -1) ?: -1
-        if (consoleId == -1) {
+    private fun loadItem() {
+        val itemId = arguments?.getInt("itemId", -1) ?: -1
+        val publicCode = PrefsHelper.getPublicCode(requireContext())
+        if (itemId == -1 || publicCode == null) {
             findNavController().popBackStack()
             return
         }
-        lifecycleScope.launch {
-            currentConsole = database.consoleDao().getConsoleById(consoleId)
-            currentConsole?.let { console -> displayConsole(console) }
-        }
-    }
-
-    // Fills every TextView with the console's stored data
-    private fun displayConsole(console: Console) {
-        binding.detailName.text = console.name
-        binding.detailBrand.text = "Brand: ${console.brand}"
-        binding.detailModel.text = "Model: ${console.model}"
-        binding.detailCondition.text = "Condition: ${console.condition}"
-        binding.detailPurchasePrice.text = "Purchase Price: $${String.format("%.2f", console.purchasePrice)}"
-        binding.detailEstimatedValue.text = "Estimated Value: $${String.format("%.2f", console.estimatedValue)}"
-        binding.detailNotes.text = if (console.notes.isNotBlank()) "Notes: ${console.notes}" else ""
-
-        // Convert stored epoch milliseconds to a human-readable date string
-        val dateFormatter = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
-        binding.detailDateAdded.text = "Added: ${dateFormatter.format(Date(console.dateAdded))}"
-
-        // Show the last price check date if available
-        if (console.lastPriceCheck != null) {
-            binding.detailLastPriceCheck.text = "Price last updated: ${dateFormatter.format(Date(console.lastPriceCheck))}"
-            binding.detailLastPriceCheck.visibility = View.VISIBLE
-        } else {
-            binding.detailLastPriceCheck.visibility = View.GONE
-        }
-
-        // Only show the refresh button if this item has a PriceCharting ID to look up
-        binding.refreshPriceButton.visibility =
-            if (console.priceChartingId != null) View.VISIBLE else View.GONE
-    }
-
-    // Calls PriceCharting, updates estimatedValue in Room, and shows a Snackbar with the change
-    private fun refreshMarketPrice() {
-        val console = currentConsole ?: return
-        val priceChartingId = console.priceChartingId ?: return
-
-        binding.refreshPriceButton.isEnabled = false
-        binding.refreshPriceButton.text = "Refreshing..."
 
         lifecycleScope.launch {
-            val priceData = priceChartingRepository.refreshPrice(priceChartingId)
-            if (priceData == null) {
-                Snackbar.make(requireView(), "Price refresh failed — check your connection", Snackbar.LENGTH_SHORT).show()
-                binding.refreshPriceButton.isEnabled = true
-                binding.refreshPriceButton.text = "Refresh Market Price"
-                return@launch
+            try {
+                val items = repository.getItems(publicCode)
+                currentItem = items.firstOrNull { it.id == itemId }
+                currentItem?.let { displayItem(it) } ?: findNavController().popBackStack()
+            } catch (exception: Exception) {
+                findNavController().popBackStack()
             }
-
-            val oldValue = console.estimatedValue
-            val newValue = priceData.bestPrice()
-
-            // Save the updated price and timestamp back to Room
-            val updatedConsole = console.copy(
-                estimatedValue = newValue,
-                lastPriceCheck = System.currentTimeMillis()
-            )
-            database.consoleDao().updateConsole(updatedConsole)
-            currentConsole = updatedConsole
-            displayConsole(updatedConsole)
-
-            val changeText = when {
-                newValue > oldValue -> "+$${String.format("%.2f", newValue - oldValue)}"
-                newValue < oldValue -> "-$${String.format("%.2f", oldValue - newValue)}"
-                else -> "no change"
-            }
-            Snackbar.make(
-                requireView(),
-                "Market price updated to $${String.format("%.2f", newValue)} ($changeText)",
-                Snackbar.LENGTH_LONG
-            ).show()
-
-            binding.refreshPriceButton.isEnabled = true
-            binding.refreshPriceButton.text = "Refresh Market Price"
         }
     }
 
-    // Navigates to AddEditConsoleFragment in edit mode, passing the current console's id
+    private fun displayItem(item: CollectionItem) {
+        binding.detailName.text = item.title
+        binding.detailBrand.text = "Platform: ${item.platform}"
+        binding.detailCondition.text = "Condition: ${item.condition}"
+        binding.detailPurchasePrice.text = "Purchase Price: $${String.format("%.2f", item.purchasePrice)}"
+        binding.detailEstimatedValue.text = "Estimated Value: $${String.format("%.2f", item.estimatedValue)}"
+        binding.detailNotes.text = if (!item.notes.isNullOrBlank()) "Notes: ${item.notes}" else ""
+        binding.detailModel.text = if (item.forTrade) "Available for trade" else ""
+        binding.detailDateAdded.visibility = View.GONE
+        binding.detailLastPriceCheck.visibility = View.GONE
+        binding.refreshPriceButton.visibility = View.GONE
+    }
+
     private fun navigateToEdit() {
-        val bundle = Bundle().apply { putInt("consoleId", currentConsole?.id ?: -1) }
+        val bundle = Bundle().apply { putInt("itemId", currentItem?.id ?: -1) }
         findNavController().navigate(R.id.action_consoleDetail_to_addEditConsole, bundle)
     }
 
-    // Asks the user to confirm before permanently deleting the console
     private fun showDeleteConfirmation() {
         AlertDialog.Builder(requireContext())
             .setTitle("Delete Console")
-            .setMessage("Delete \"${currentConsole?.name}\" from your collection?")
-            .setPositiveButton("Delete") { _, _ -> deleteConsole() }
+            .setMessage("Remove \"${currentItem?.title}\" from your collection?")
+            .setPositiveButton("Delete") { _, _ -> deleteItem() }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    private fun deleteConsole() {
-        val consoleToDelete = currentConsole ?: return
+    private fun deleteItem() {
+        val item = currentItem ?: return
+        val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
         lifecycleScope.launch {
-            database.consoleDao().deleteConsole(consoleToDelete)
-            Snackbar.make(requireView(), "${consoleToDelete.name} deleted", Snackbar.LENGTH_SHORT).show()
-            findNavController().popBackStack()
+            try {
+                repository.deleteItem(publicCode, item.id)
+                Snackbar.make(requireView(), "${item.title} removed", Snackbar.LENGTH_SHORT).show()
+                findNavController().popBackStack()
+            } catch (exception: Exception) {
+                Snackbar.make(requireView(), "Could not delete — check your connection", Snackbar.LENGTH_SHORT).show()
+            }
         }
     }
 

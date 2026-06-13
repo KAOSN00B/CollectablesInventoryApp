@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- Scrollable form area so the keyboard doesn't block inputs on small screens -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -18,7 +16,6 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <!-- Title — required field -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -31,7 +28,6 @@
                     android:inputType="textCapWords" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Platform selector -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -48,24 +44,13 @@
                 android:gravity="start|center_vertical"
                 android:paddingStart="16dp" />
 
-            <!-- Genre selector -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Genre"
-                android:textSize="12sp"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:layout_marginBottom="4dp" />
+            <!-- Hidden — genre not used in CollectOS -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/genre_button"
-                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="start|center_vertical"
-                android:paddingStart="16dp" />
+                android:visibility="gone" />
 
-            <!-- Condition selector -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -82,24 +67,13 @@
                 android:gravity="start|center_vertical"
                 android:paddingStart="16dp" />
 
-            <!-- Completion status selector -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Completion Status"
-                android:textSize="12sp"
-                android:textColor="?attr/colorOnSurfaceVariant"
-                android:layout_marginBottom="4dp" />
+            <!-- Hidden — completion not used in CollectOS -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/completion_button"
-                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:gravity="start|center_vertical"
-                android:paddingStart="16dp" />
+                android:visibility="gone" />
 
-            <!-- Purchase price input -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -112,7 +86,7 @@
                     android:inputType="numberDecimal" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Estimated current value input -->
+            <!-- Read-only — auto-calculated from condition when adding from catalog -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -122,27 +96,26 @@
                     android:id="@+id/estimated_value_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="numberDecimal" />
+                    android:inputType="numberDecimal"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:cursorVisible="false" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Optional notes -->
+            <!-- Hidden — notes removed -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:hint="Notes (optional)">
+                android:visibility="gone">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/notes_input"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
-                    android:minLines="3" />
+                    android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
 
         </LinearLayout>
     </ScrollView>
 
-    <!-- Save button stays pinned at the bottom regardless of scroll position -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/save_button"
         android:layout_width="match_parent"

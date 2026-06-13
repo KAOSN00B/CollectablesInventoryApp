@@ -1,4 +1,4 @@
-﻿package com.lasallecollegevancouver.gameinventoryapp.ui.dashboard
+package com.lasallecollegevancouver.gameinventoryapp.ui.dashboard
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,8 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.lasallecollegevancouver.gameinventoryapp.R
-import com.lasallecollegevancouver.gameinventoryapp.data.AppDatabase
+import com.lasallecollegevancouver.gameinventoryapp.config.PrefsHelper
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentDashboardBinding
+import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
 import com.lasallecollegevancouver.gameinventoryapp.ui.smart_add.SmartAddBottomSheet
 import kotlinx.coroutines.launch
 
@@ -18,7 +19,7 @@ class DashboardFragment : Fragment() {
     private var _binding: FragmentDashboardBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var database: AppDatabase
+    private val repository = CollectOsRepository()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
@@ -27,12 +28,22 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        database = AppDatabase.getInstance(requireContext())
+
         binding.buttonScan.setOnClickListener { findNavController().navigate(R.id.action_global_barcodeScan) }
         binding.buttonSearch.setOnClickListener { findNavController().navigate(R.id.action_global_search) }
         binding.buttonAdd.setOnClickListener {
             SmartAddBottomSheet.newInstance().show(parentFragmentManager, "SmartAdd")
         }
+
+        // CollectOS only has GAME and CONSOLE types; hide unused category rows
+        binding.comicsCategoryValue.visibility = View.GONE
+        binding.comicsCategoryCount.visibility = View.GONE
+        binding.tcgCategoryValue.visibility = View.GONE
+        binding.tcgCategoryCount.visibility = View.GONE
+        binding.toysCategoryValue.visibility = View.GONE
+        binding.toysCategoryCount.visibility = View.GONE
+        binding.legoCategoryValue.visibility = View.GONE
+        binding.legoCategoryCount.visibility = View.GONE
     }
 
     override fun onResume() {
@@ -41,48 +52,41 @@ class DashboardFragment : Fragment() {
     }
 
     private fun loadDashboardData() {
+        val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
         lifecycleScope.launch {
-            val gamesTotal = database.gameDao().getTotalValue()
-            val gamesCount = database.gameDao().getCount()
-            val consolesTotal = database.consoleDao().getTotalValue()
-            val consolesCount = database.consoleDao().getCount()
-            val comicsTotal = database.collectibleDao().getTotalValueByType("COMIC")
-            val comicsCount = database.collectibleDao().getCountByType("COMIC")
-            val tcgTotal = database.collectibleDao().getTotalValueByType("TCG")
-            val tcgCount = database.collectibleDao().getCountByType("TCG")
-            val toysTotal = database.collectibleDao().getTotalValueByType("TOY")
-            val toysCount = database.collectibleDao().getCountByType("TOY")
-            val legoTotal = database.collectibleDao().getTotalValueByType("LEGO")
-            val legoCount = database.collectibleDao().getCountByType("LEGO")
-            val recentGames = database.gameDao().getRecentGames()
-            val wishlistCount = database.wishlistDao().getAllWishlistItems().size
+            try {
+                val allItems = repository.getItems(publicCode)
+                val wishlistItems = repository.getWishlist(publicCode)
 
-            val grandTotal = gamesTotal + consolesTotal + comicsTotal + tcgTotal + toysTotal + legoTotal
-            val totalCount = gamesCount + consolesCount + comicsCount + tcgCount + toysCount + legoCount
+                val games = allItems.filter { it.type == "GAME" }
+                val consoles = allItems.filter { it.type == "CONSOLE" }
 
-            binding.grandTotalValue.text = "$${String.format("%.2f", grandTotal)}"
-            binding.totalItemCount.text = "$totalCount items in collection"
+                val gamesTotal = games.sumOf { it.estimatedValue }
+                val consolesTotal = consoles.sumOf { it.estimatedValue }
+                val grandTotal = gamesTotal + consolesTotal
+                val totalCount = allItems.size
 
-            binding.gamesCategoryValue.text = "Games  $${String.format("%.2f", gamesTotal)}"
-            binding.gamesCategoryCount.text = "$gamesCount games"
-            binding.consolesCategoryValue.text = "Consoles  $${String.format("%.2f", consolesTotal)}"
-            binding.consolesCategoryCount.text = "$consolesCount consoles"
-            binding.comicsCategoryValue.text = "Comics  $${String.format("%.2f", comicsTotal)}"
-            binding.comicsCategoryCount.text = "$comicsCount comics"
-            binding.tcgCategoryValue.text = "Trading Cards  $${String.format("%.2f", tcgTotal)}"
-            binding.tcgCategoryCount.text = "$tcgCount cards"
-            binding.toysCategoryValue.text = "Toys / Figures  $${String.format("%.2f", toysTotal)}"
-            binding.toysCategoryCount.text = "$toysCount toys"
-            binding.legoCategoryValue.text = "LEGO  $${String.format("%.2f", legoTotal)}"
-            binding.legoCategoryCount.text = "$legoCount sets"
-            binding.wishlistCount.text = "$wishlistCount items on wishlist"
+                binding.grandTotalValue.text = "$${String.format("%.2f", grandTotal)}"
+                binding.totalItemCount.text = "$totalCount items in collection"
 
-            binding.recentGamesText.text = if (recentGames.isEmpty()) {
-                "No games added yet"
-            } else {
-                recentGames.joinToString("\n") { game ->
-                    "${game.title} (${game.platform}) - $${String.format("%.2f", game.estimatedValue)}"
+                binding.gamesCategoryValue.text = "Games  $${String.format("%.2f", gamesTotal)}"
+                binding.gamesCategoryCount.text = "${games.size} games"
+                binding.consolesCategoryValue.text = "Consoles  $${String.format("%.2f", consolesTotal)}"
+                binding.consolesCategoryCount.text = "${consoles.size} consoles"
+
+                binding.wishlistCount.text = "${wishlistItems.size} items on wishlist"
+
+                val recentGames = allItems.sortedByDescending { it.createdAt }.take(5)
+                binding.recentGamesText.text = if (recentGames.isEmpty()) {
+                    "No items added yet"
+                } else {
+                    recentGames.joinToString("\n") { item ->
+                        "${item.title} (${item.platform}) — $${String.format("%.2f", item.estimatedValue)}"
+                    }
                 }
+            } catch (exception: Exception) {
+                binding.grandTotalValue.text = "$0.00"
+                binding.totalItemCount.text = "Could not load — check your connection"
             }
         }
     }

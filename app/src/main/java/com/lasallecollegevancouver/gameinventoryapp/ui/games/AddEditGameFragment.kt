@@ -8,9 +8,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.lasallecollegevancouver.gameinventoryapp.data.AppDatabase
-import com.lasallecollegevancouver.gameinventoryapp.data.Game
+import com.lasallecollegevancouver.gameinventoryapp.config.PrefsHelper
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentAddEditGameBinding
+import com.lasallecollegevancouver.gameinventoryapp.network.AddItemRequest
+import com.lasallecollegevancouver.gameinventoryapp.network.CollectionItem
+import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
+import com.lasallecollegevancouver.gameinventoryapp.network.UpdateItemRequest
 import kotlinx.coroutines.launch
 
 class AddEditGameFragment : Fragment() {
@@ -18,192 +21,192 @@ class AddEditGameFragment : Fragment() {
     private var _binding: FragmentAddEditGameBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var database: AppDatabase
+    private val repository = CollectOsRepository()
+    private var existingItem: CollectionItem? = null
+    private var prefillCatalogItemId: Int? = null
 
-    // The game being edited — null when the user is adding a new game
-    private var existingGame: Game? = null
+    // Catalog prices passed from search — used to auto-set value when condition changes
+    private var catalogLooseValue = 0.0
+    private var catalogCibValue = 0.0
+    private var catalogNewValue = 0.0
+    private var hasCalogPrices = false
 
-    // Set when the barcode scanner or AI flow pre-identifies the item
-    private var prefillPriceChartingId: Int? = null
+    private var selectedPlatform = "SNES"
+    private var selectedCondition = "CIB"
 
-    // Tracks the currently chosen value for each dropdown field
-    private var selectedPlatform = "PlayStation 5"
-    private var selectedGenre = "Action"
-    private var selectedCondition = "Good"
-    private var selectedCompletionStatus = "Not Started"
+    private val platformOptions = arrayOf(
+        "SNES", "N64", "Game Boy", "Game Boy Color", "GBA", "Virtual Boy",
+        "GameCube", "Switch", "PS1", "PS2", "PS4", "PS5",
+        "Genesis", "Saturn", "Dreamcast",
+        "Atari 2600", "Atari 7800", "Jaguar", "Lynx", "Xbox"
+    )
+    private val conditionOptions = arrayOf("LOOSE", "CIB", "NEW", "POOR")
 
-    private val platformOptions = arrayOf("PlayStation 5", "Xbox Series X", "Nintendo Switch", "PC", "Other")
-    private val genreOptions = arrayOf("Action", "RPG", "Sports", "Racing", "Shooter", "Platformer", "Strategy", "Horror", "Adventure", "Other")
-    private val conditionOptions = arrayOf("New", "Like New", "Good", "Fair", "Poor")
-    private val completionOptions = arrayOf("Not Started", "In Progress", "Completed", "100%")
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentAddEditGameBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        database = AppDatabase.getInstance(requireContext())
 
-        val gameId = arguments?.getInt("gameId", -1) ?: -1
-
-        // Load existing data when editing; leave fields blank for a new game
-        if (gameId != -1) {
-            loadExistingGame(gameId)
+        val itemId = arguments?.getInt("itemId", -1) ?: -1
+        if (itemId != -1) {
+            loadExistingItem(itemId)
         } else {
-            // Apply any pre-filled data from barcode scan or AI identification
-            applyPrefillBundle()
+            applyPrefill()
         }
 
-        setupDropdownButtons()
-        binding.saveButton.setOnClickListener { saveGame() }
+        setupDropdowns()
+        binding.saveButton.setOnClickListener { saveItem() }
     }
 
-    // Wires each outlined button to open a single-choice AlertDialog
-    private fun setupDropdownButtons() {
+    private fun setupDropdowns() {
         updateButtonLabels()
 
         binding.platformButton.setOnClickListener {
-            showSelectionDialog("Platform", platformOptions, selectedPlatform) { selection ->
-                selectedPlatform = selection
+            showSelectionDialog("Platform", platformOptions, selectedPlatform) { chosen ->
+                selectedPlatform = chosen
                 binding.platformButton.text = selectedPlatform
             }
         }
-        binding.genreButton.setOnClickListener {
-            showSelectionDialog("Genre", genreOptions, selectedGenre) { selection ->
-                selectedGenre = selection
-                binding.genreButton.text = selectedGenre
-            }
-        }
         binding.conditionButton.setOnClickListener {
-            showSelectionDialog("Condition", conditionOptions, selectedCondition) { selection ->
-                selectedCondition = selection
+            showSelectionDialog("Condition", conditionOptions, selectedCondition) { chosen ->
+                selectedCondition = chosen
                 binding.conditionButton.text = selectedCondition
-            }
-        }
-        binding.completionButton.setOnClickListener {
-            showSelectionDialog("Completion Status", completionOptions, selectedCompletionStatus) { selection ->
-                selectedCompletionStatus = selection
-                binding.completionButton.text = selectedCompletionStatus
+                // Auto-update estimated value when condition changes and we have catalog prices
+                if (hasCalogPrices) updateEstimatedValueFromCondition()
             }
         }
     }
 
-    // Reusable AlertDialog that shows a list of options and calls back with the chosen one
-    private fun showSelectionDialog(
-        title: String,
-        options: Array<String>,
-        currentValue: String,
-        onSelected: (String) -> Unit
-    ) {
-        val currentIndex = options.indexOf(currentValue).coerceAtLeast(0)
+    private fun showSelectionDialog(title: String, options: Array<String>, current: String, onSelected: (String) -> Unit) {
+        val index = options.indexOf(current).coerceAtLeast(0)
         AlertDialog.Builder(requireContext())
             .setTitle(title)
-            .setSingleChoiceItems(options, currentIndex) { dialog, index ->
-                onSelected(options[index])
+            .setSingleChoiceItems(options, index) { dialog, i ->
+                onSelected(options[i])
                 dialog.dismiss()
             }
             .show()
     }
 
-    // Sets button labels to their default selected values
     private fun updateButtonLabels() {
         binding.platformButton.text = selectedPlatform
-        binding.genreButton.text = selectedGenre
         binding.conditionButton.text = selectedCondition
-        binding.completionButton.text = selectedCompletionStatus
     }
 
-    // Applies title, platform, genre, estimated value from a barcode or AI result bundle
-    private fun applyPrefillBundle() {
+    private fun applyPrefill() {
         val args = arguments ?: return
+
         val prefillTitle = args.getString("prefillTitle") ?: return
 
+        // Lock title and platform — these come from the catalog and should not be changed
         binding.titleInput.setText(prefillTitle)
+        binding.titleInput.isFocusable = false
+        binding.titleInput.isClickable = false
 
         val prefillPlatform = args.getString("prefillPlatform", "")
         if (!prefillPlatform.isNullOrEmpty() && platformOptions.contains(prefillPlatform)) {
             selectedPlatform = prefillPlatform
         }
+        binding.platformButton.isEnabled = false
 
-        val prefillGenre = args.getString("prefillGenre", "")
-        if (!prefillGenre.isNullOrEmpty() && genreOptions.contains(prefillGenre)) {
-            selectedGenre = prefillGenre
-        }
+        // Store catalog prices so condition changes auto-update the estimated value
+        catalogLooseValue = args.getDouble("prefillLooseValue", 0.0)
+        catalogCibValue = args.getDouble("prefillCibValue", 0.0)
+        catalogNewValue = args.getDouble("prefillNewValue", 0.0)
+        hasCalogPrices = catalogCibValue > 0.0
 
-        val prefillValue = args.getDouble("prefillEstimatedValue", 0.0)
-        if (prefillValue > 0.0) {
-            binding.estimatedValueInput.setText(String.format("%.2f", prefillValue))
-        }
-
-        val priceChartingId = args.getInt("prefillPriceChartingId", -1)
-        if (priceChartingId != -1) {
-            prefillPriceChartingId = priceChartingId
-        }
+        val catalogId = args.getInt("prefillCatalogItemId", -1)
+        if (catalogId != -1) prefillCatalogItemId = catalogId
 
         updateButtonLabels()
+        updateEstimatedValueFromCondition()
     }
 
-    // Loads the existing game from Room and fills all form inputs with its current data
-    private fun loadExistingGame(gameId: Int) {
-        lifecycleScope.launch {
-            existingGame = database.gameDao().getGameById(gameId)
-            existingGame?.let { game ->
-                binding.titleInput.setText(game.title)
-                binding.purchasePriceInput.setText(game.purchasePrice.toString())
-                binding.estimatedValueInput.setText(game.estimatedValue.toString())
-                binding.notesInput.setText(game.notes)
+    // Maps the selected condition to the matching catalog price
+    private fun updateEstimatedValueFromCondition() {
+        val value = when (selectedCondition) {
+            "LOOSE" -> catalogLooseValue
+            "CIB"   -> catalogCibValue
+            "NEW"   -> catalogNewValue
+            "POOR"  -> catalogLooseValue * 0.5
+            else    -> catalogCibValue
+        }
+        binding.estimatedValueInput.setText(String.format("%.2f", value))
+    }
 
-                // Restore the dropdown selections to what was previously saved
-                selectedPlatform = game.platform
-                selectedGenre = game.genre
-                selectedCondition = game.condition
-                selectedCompletionStatus = game.completionStatus
-                updateButtonLabels()
+    private fun loadExistingItem(itemId: Int) {
+        val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
+        lifecycleScope.launch {
+            try {
+                val items = repository.getItems(publicCode)
+                existingItem = items.firstOrNull { it.id == itemId }
+                existingItem?.let { item ->
+                    binding.titleInput.setText(item.title)
+                    binding.titleInput.isFocusable = false
+                    binding.titleInput.isClickable = false
+                    binding.platformButton.isEnabled = false
+                    binding.purchasePriceInput.setText(item.purchasePrice.toString())
+                    binding.estimatedValueInput.setText(item.estimatedValue.toString())
+                    selectedPlatform = item.platform
+                    selectedCondition = item.condition
+                    updateButtonLabels()
+                }
+            } catch (exception: Exception) {
+                findNavController().popBackStack()
             }
         }
     }
 
-    // Validates required fields, builds the Game object, and inserts or updates it in Room
-    private fun saveGame() {
+    private fun saveItem() {
         val title = binding.titleInput.text.toString().trim()
         if (title.isEmpty()) {
             binding.titleInput.error = "Title is required"
             return
         }
 
+        val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
         val purchasePrice = binding.purchasePriceInput.text.toString().toDoubleOrNull() ?: 0.0
         val estimatedValue = binding.estimatedValueInput.text.toString().toDoubleOrNull() ?: 0.0
-        val notes = binding.notesInput.text.toString().trim()
 
-        val game = Game(
-            // Use the existing id when editing; 0 tells Room to auto-generate an id for new games
-            id = existingGame?.id ?: 0,
-            title = title,
-            platform = selectedPlatform,
-            genre = selectedGenre,
-            condition = selectedCondition,
-            completionStatus = selectedCompletionStatus,
-            purchasePrice = purchasePrice,
-            estimatedValue = estimatedValue,
-            notes = notes,
-            // Preserve the original add date when editing; record now when adding
-            dateAdded = existingGame?.dateAdded ?: System.currentTimeMillis(),
-            // Preserve PriceCharting ID from edit or carry over from barcode/AI prefill
-            priceChartingId = existingGame?.priceChartingId ?: prefillPriceChartingId,
-            lastPriceCheck = existingGame?.lastPriceCheck
-        )
-
+        binding.saveButton.isEnabled = false
         lifecycleScope.launch {
-            if (existingGame == null) {
-                database.gameDao().insertGame(game)
-            } else {
-                database.gameDao().updateGame(game)
+            try {
+                if (existingItem == null) {
+                    repository.addItem(
+                        publicCode,
+                        AddItemRequest(
+                            catalogItemId = prefillCatalogItemId,
+                            type = "GAME",
+                            title = title,
+                            platform = selectedPlatform,
+                            condition = selectedCondition,
+                            purchasePrice = purchasePrice,
+                            estimatedValue = estimatedValue,
+                            notes = null,
+                            forTrade = false
+                        )
+                    )
+                } else {
+                    repository.updateItem(
+                        publicCode,
+                        existingItem!!.id,
+                        UpdateItemRequest(
+                            condition = selectedCondition,
+                            purchasePrice = purchasePrice,
+                            estimatedValue = existingItem!!.estimatedValue,
+                            notes = null,
+                            forTrade = existingItem!!.forTrade
+                        )
+                    )
+                }
+                findNavController().popBackStack()
+            } catch (exception: Exception) {
+                binding.saveButton.isEnabled = true
+                binding.titleInput.error = "Could not save — check your connection"
             }
-            findNavController().popBackStack()
         }
     }
 

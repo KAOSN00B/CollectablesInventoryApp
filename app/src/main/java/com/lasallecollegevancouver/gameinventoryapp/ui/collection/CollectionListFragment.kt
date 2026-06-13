@@ -1,4 +1,4 @@
-﻿package com.lasallecollegevancouver.gameinventoryapp.ui.collection
+package com.lasallecollegevancouver.gameinventoryapp.ui.collection
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,8 +9,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.lasallecollegevancouver.gameinventoryapp.R
-import com.lasallecollegevancouver.gameinventoryapp.data.AppDatabase
+import com.lasallecollegevancouver.gameinventoryapp.config.PrefsHelper
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentCollectionListBinding
+import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
+import com.lasallecollegevancouver.gameinventoryapp.network.CollectionItem
 import com.lasallecollegevancouver.gameinventoryapp.ui.smart_add.SmartAddBottomSheet
 import kotlinx.coroutines.launch
 
@@ -19,10 +21,9 @@ class CollectionListFragment : Fragment() {
     private var _binding: FragmentCollectionListBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var database: AppDatabase
-    private lateinit var adapter: CollectionAdapter
-    private var allEntries: List<CollectionEntry> = emptyList()
-    private var currentFilter = "ALL"
+    private val repository = CollectOsRepository()
+    private lateinit var collectionAdapter: CollectionEntryAdapter
+    private var allItems: List<CollectionItem> = emptyList()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCollectionListBinding.inflate(inflater, container, false)
@@ -31,117 +32,60 @@ class CollectionListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        database = AppDatabase.getInstance(requireContext())
-        setupRecyclerView()
-        setupFilters()
-        binding.fabAddItem.setOnClickListener { showSmartAdd() }
-        binding.emptyAddButton.setOnClickListener { showSmartAdd() }
+
+        collectionAdapter = CollectionEntryAdapter { selectedItem ->
+            val bundle = Bundle().apply { putInt("itemId", selectedItem.id) }
+            when (selectedItem.type) {
+                "GAME" -> findNavController().navigate(R.id.action_collectionList_to_gameDetail, bundle)
+                "CONSOLE" -> findNavController().navigate(R.id.action_collectionList_to_consoleDetail, bundle)
+            }
+        }
+        binding.collectionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.collectionRecyclerView.adapter = collectionAdapter
+
+        // CollectOS only has GAME and CONSOLE types — hide unused filter chips
+        binding.chipComics.visibility = View.GONE
+        binding.chipTcg.visibility = View.GONE
+        binding.chipToys.visibility = View.GONE
+        binding.chipLego.visibility = View.GONE
+
+        binding.categoryChipGroup.setOnCheckedStateChangeListener { _, _ -> applyFilter() }
+
+        binding.fabAddItem.setOnClickListener {
+            SmartAddBottomSheet.newInstance().show(parentFragmentManager, "SmartAdd")
+        }
+        binding.emptyAddButton.setOnClickListener {
+            SmartAddBottomSheet.newInstance().show(parentFragmentManager, "SmartAdd")
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        loadCollection()
+        loadItems()
     }
 
-    private fun setupRecyclerView() {
-        adapter = CollectionAdapter { entry -> openEntry(entry) }
-        binding.collectionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-        binding.collectionRecyclerView.adapter = adapter
-    }
-
-    private fun setupFilters() {
-        binding.categoryChipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
-            currentFilter = when (checkedIds.firstOrNull()) {
-                R.id.chip_games -> "GAME"
-                R.id.chip_consoles -> "CONSOLE"
-                R.id.chip_comics -> "COMIC"
-                R.id.chip_tcg -> "TCG"
-                R.id.chip_toys -> "TOY"
-                R.id.chip_lego -> "LEGO"
-                else -> "ALL"
-            }
-            applyFilter()
-        }
-    }
-
-    private fun loadCollection() {
+    private fun loadItems() {
+        val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
         lifecycleScope.launch {
-            val games = database.gameDao().getAllGames().map { game ->
-                CollectionEntry(
-                    sourceId = game.id,
-                    category = "GAME",
-                    title = game.title,
-                    meta = game.platform,
-                    condition = "${game.condition} • ${game.completionStatus}",
-                    estimatedValue = game.estimatedValue,
-                    dateAdded = game.dateAdded
-                )
+            try {
+                allItems = repository.getItems(publicCode)
+                applyFilter()
+            } catch (exception: Exception) {
+                binding.emptyState.visibility = View.VISIBLE
             }
-            val consoles = database.consoleDao().getAllConsoles().map { console ->
-                CollectionEntry(
-                    sourceId = console.id,
-                    category = "CONSOLE",
-                    title = console.name,
-                    meta = listOf(console.brand, console.model).filter { it.isNotBlank() }.joinToString(" • "),
-                    condition = console.condition,
-                    estimatedValue = console.estimatedValue,
-                    dateAdded = console.dateAdded
-                )
-            }
-            val collectibles = database.collectibleDao().getAllCollectibles().map { collectible ->
-                CollectionEntry(
-                    sourceId = collectible.id,
-                    category = collectible.type,
-                    title = collectible.name,
-                    meta = collectibleMeta(collectible.type, collectible.publisher, collectible.tcgGame, collectible.brand, collectible.theme),
-                    condition = collectible.condition,
-                    estimatedValue = collectible.estimatedValue,
-                    dateAdded = collectible.dateAdded
-                )
-            }
-            allEntries = (games + consoles + collectibles).sortedByDescending { it.dateAdded }
-            applyFilter()
-        }
-    }
-
-    private fun collectibleMeta(type: String, publisher: String?, tcgGame: String?, brand: String?, theme: String?): String {
-        return when (type) {
-            "COMIC" -> publisher ?: "Comic"
-            "TCG" -> tcgGame ?: "Trading Card"
-            "TOY" -> brand ?: "Toy / Figure"
-            "LEGO" -> theme ?: "LEGO"
-            else -> type
         }
     }
 
     private fun applyFilter() {
-        val filtered = if (currentFilter == "ALL") allEntries else allEntries.filter { it.category == currentFilter }
-        adapter.submitList(filtered)
-        binding.emptyState.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
-        val total = filtered.sumOf { it.estimatedValue }
-        binding.summaryText.text = "${filtered.size} items • $${String.format("%.2f", total)} estimated value"
-    }
-
-    private fun openEntry(entry: CollectionEntry) {
-        val bundle = Bundle()
-        when (entry.category) {
-            "GAME" -> {
-                bundle.putInt("gameId", entry.sourceId)
-                findNavController().navigate(R.id.action_collectionList_to_gameDetail, bundle)
-            }
-            "CONSOLE" -> {
-                bundle.putInt("consoleId", entry.sourceId)
-                findNavController().navigate(R.id.action_collectionList_to_consoleDetail, bundle)
-            }
-            else -> {
-                bundle.putInt("collectibleId", entry.sourceId)
-                findNavController().navigate(R.id.action_collectionList_to_collectibleDetail, bundle)
-            }
+        val filtered = when (binding.categoryChipGroup.checkedChipId) {
+            R.id.chip_games -> allItems.filter { it.type == "GAME" }
+            R.id.chip_consoles -> allItems.filter { it.type == "CONSOLE" }
+            else -> allItems
         }
-    }
-
-    private fun showSmartAdd() {
-        SmartAddBottomSheet.newInstance().show(parentFragmentManager, "SmartAdd")
+        collectionAdapter.submitList(filtered)
+        val total = filtered.sumOf { it.estimatedValue }
+        binding.summaryText.text = "${filtered.size} items · $${String.format("%.2f", total)} estimated value"
+        binding.emptyState.visibility = if (filtered.isEmpty()) View.VISIBLE else View.GONE
     }
 
     override fun onDestroyView() {

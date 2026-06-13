@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.lasallecollegevancouver.gameinventoryapp.data.WishlistItem
 import com.lasallecollegevancouver.gameinventoryapp.databinding.ItemWishlistBinding
+import com.lasallecollegevancouver.gameinventoryapp.network.WishlistItem
 
 class WishlistAdapter(
     private val onItemClick: (WishlistItem) -> Unit
@@ -26,10 +26,10 @@ class WishlistAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: WishlistItem) {
-            binding.wishlistItemTitle.text = item.title
-            binding.wishlistItemType.text = "${item.type} — ${item.platform}"
+            binding.wishlistItemTitle.text = if (item.isGrail) "★ ${item.title}" else item.title
+            binding.wishlistItemType.text = item.platform
             binding.wishlistItemTargetPrice.text = "Target: $${String.format("%.2f", item.targetPrice)}"
-            binding.wishlistItemMarketPrice.text = "Market: $${String.format("%.2f", item.currentMarketPrice)}"
+            binding.wishlistItemMarketPrice.text = "Value: $${String.format("%.2f", item.currentEstimatedValue)}"
             binding.root.setOnClickListener { onItemClick(item) }
         }
     }

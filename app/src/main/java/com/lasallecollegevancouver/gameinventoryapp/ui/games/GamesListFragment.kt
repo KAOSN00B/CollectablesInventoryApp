@@ -16,9 +16,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.lasallecollegevancouver.gameinventoryapp.R
-import com.lasallecollegevancouver.gameinventoryapp.data.AppDatabase
-import com.lasallecollegevancouver.gameinventoryapp.data.Game
+import com.lasallecollegevancouver.gameinventoryapp.config.PrefsHelper
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentGamesListBinding
+import com.lasallecollegevancouver.gameinventoryapp.network.CollectionItem
+import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
 import com.lasallecollegevancouver.gameinventoryapp.ui.smart_add.SmartAddBottomSheet
 import kotlinx.coroutines.launch
 
@@ -27,34 +28,23 @@ class GamesListFragment : Fragment() {
     private var _binding: FragmentGamesListBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var database: AppDatabase
+    private val repository = CollectOsRepository()
     private lateinit var gameAdapter: GameAdapter
 
-    // The complete list from Room — never filtered or sorted directly
-    private var fullGameList: List<Game> = emptyList()
-
-    // The list actually shown in the RecyclerView after sort and filter are applied
-    private var displayGameList: MutableList<Game> = mutableListOf()
-
-    // Remembers the active sort and filter so they survive a data reload
+    private var fullGameList: List<CollectionItem> = emptyList()
     private var currentSort = "Date Added"
     private var currentFilter = "All Platforms"
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentGamesListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        database = AppDatabase.getInstance(requireContext())
-
-        setupMenuItems()
+        setupMenu()
         setupRecyclerView()
 
-        // Open the Smart Add bottom sheet — offers barcode scan, AI identify, or manual entry
         binding.fabAddGame.setOnClickListener {
             SmartAddBottomSheet.newInstance(R.id.action_gamesList_to_addEditGame)
                 .show(parentFragmentManager, "SmartAdd")
@@ -63,12 +53,10 @@ class GamesListFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        // Reload every time the user returns here so new or edited games appear immediately
         loadGames()
     }
 
-    // Registers the Sort and Filter menu items via the modern MenuProvider API
-    private fun setupMenuItems() {
+    private fun setupMenu() {
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
@@ -84,73 +72,70 @@ class GamesListFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-    // Sets up the RecyclerView with a vertical list layout and the game adapter
     private fun setupRecyclerView() {
-        gameAdapter = GameAdapter { selectedGame ->
-            // Pass the selected game's ID to the detail screen via a Bundle
-            val bundle = Bundle().apply { putInt("gameId", selectedGame.id) }
+        gameAdapter = GameAdapter { selectedItem ->
+            val bundle = Bundle().apply { putInt("itemId", selectedItem.id) }
             findNavController().navigate(R.id.action_gamesList_to_gameDetail, bundle)
         }
         binding.gamesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.gamesRecyclerView.adapter = gameAdapter
     }
 
-    // Fetches all games from Room, then re-applies the current sort and filter
     private fun loadGames() {
+        val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
         lifecycleScope.launch {
-            fullGameList = database.gameDao().getAllGames()
-            applyCurrentSortAndFilter()
+            try {
+                // Fetch all items and keep only games
+                fullGameList = repository.getItems(publicCode).filter { it.type == "GAME" }
+                applyCurrentSortAndFilter()
+            } catch (exception: Exception) {
+                binding.emptyStateText.text = "Could not load games — check your connection"
+                binding.emptyStateText.visibility = View.VISIBLE
+            }
         }
     }
 
-    // Filters then sorts fullGameList and hands the result to the adapter
     private fun applyCurrentSortAndFilter() {
-        var filteredList = fullGameList
-
-        // Keep only games matching the selected platform (skip filter if "All Platforms")
+        var filtered = fullGameList
         if (currentFilter != "All Platforms") {
-            filteredList = filteredList.filter { game -> game.platform == currentFilter }
+            filtered = filtered.filter { it.platform == currentFilter }
         }
 
-        // Sort the filtered list by the selected order
-        val sortedList = when (currentSort) {
-            "Title A–Z"      -> filteredList.sortedBy { game -> game.title }
-            "Title Z–A"      -> filteredList.sortedByDescending { game -> game.title }
-            "Platform"            -> filteredList.sortedBy { game -> game.platform }
-            "Value High–Low" -> filteredList.sortedByDescending { game -> game.estimatedValue }
-            else                  -> filteredList.sortedByDescending { game -> game.dateAdded }
+        val sorted = when (currentSort) {
+            "Title A–Z"      -> filtered.sortedBy { it.title }
+            "Title Z–A"      -> filtered.sortedByDescending { it.title }
+            "Platform"       -> filtered.sortedBy { it.platform }
+            "Value High–Low" -> filtered.sortedByDescending { it.estimatedValue }
+            else             -> filtered.sortedByDescending { it.createdAt }
         }
 
-        displayGameList = sortedList.toMutableList()
-        gameAdapter.submitList(displayGameList.toList())
-
-        // Show a helpful message when there is nothing to display
-        binding.emptyStateText.visibility =
-            if (displayGameList.isEmpty()) View.VISIBLE else View.GONE
+        gameAdapter.submitList(sorted)
+        binding.emptyStateText.visibility = if (sorted.isEmpty()) View.VISIBLE else View.GONE
+        if (sorted.isEmpty()) binding.emptyStateText.text = "No games yet — tap + to add one"
     }
 
-    // Shows a single-choice dialog for picking a sort order
     private fun showSortDialog() {
-        val sortOptions = arrayOf("Date Added", "Title A–Z", "Title Z–A", "Platform", "Value High–Low")
-        val currentIndex = sortOptions.indexOf(currentSort).coerceAtLeast(0)
+        val options = arrayOf("Date Added", "Title A–Z", "Title Z–A", "Platform", "Value High–Low")
+        val currentIndex = options.indexOf(currentSort).coerceAtLeast(0)
         AlertDialog.Builder(requireContext())
             .setTitle("Sort By")
-            .setSingleChoiceItems(sortOptions, currentIndex) { dialog, selectedIndex ->
-                currentSort = sortOptions[selectedIndex]
+            .setSingleChoiceItems(options, currentIndex) { dialog, index ->
+                currentSort = options[index]
                 applyCurrentSortAndFilter()
                 dialog.dismiss()
             }
             .show()
     }
 
-    // Shows a single-choice dialog for filtering by platform
     private fun showFilterDialog() {
-        val filterOptions = arrayOf("All Platforms", "PlayStation 5", "Xbox Series X", "Nintendo Switch", "PC", "Other")
-        val currentIndex = filterOptions.indexOf(currentFilter).coerceAtLeast(0)
+        val platforms = arrayOf("All Platforms", "SNES", "N64", "Game Boy", "Game Boy Color",
+            "GBA", "Virtual Boy", "GameCube", "Switch", "PS1", "PS2", "PS4", "PS5",
+            "Genesis", "Saturn", "Dreamcast", "Atari 2600", "Atari 7800", "Jaguar", "Lynx", "Xbox")
+        val currentIndex = platforms.indexOf(currentFilter).coerceAtLeast(0)
         AlertDialog.Builder(requireContext())
             .setTitle("Filter by Platform")
-            .setSingleChoiceItems(filterOptions, currentIndex) { dialog, selectedIndex ->
-                currentFilter = filterOptions[selectedIndex]
+            .setSingleChoiceItems(platforms, currentIndex) { dialog, index ->
+                currentFilter = platforms[index]
                 applyCurrentSortAndFilter()
                 dialog.dismiss()
             }
@@ -159,7 +144,6 @@ class GamesListFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // Null the binding to avoid memory leaks when the fragment view is destroyed
         _binding = null
     }
 }
