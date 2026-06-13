@@ -28,10 +28,10 @@ router.get("/search", async (req: Request, res: Response) => {
       FROM catalog_items
       WHERE platform = ${platform}
         AND (
-          "searchableText" ILIKE ${searchPattern}
-          OR similarity("searchableText", ${query}) > 0.2
+          title ILIKE ${searchPattern}
+          OR word_similarity(${query}, title) > 0.35
         )
-      ORDER BY similarity("searchableText", ${query}) DESC
+      ORDER BY word_similarity(${query}, title) DESC
       LIMIT ${limit}
     `;
   } else {
@@ -40,9 +40,9 @@ router.get("/search", async (req: Request, res: Response) => {
     >`
       SELECT id, type, title, platform, upc, "looseValue", "cibValue", "newValue", genre, "releaseYear", "imageUrl"
       FROM catalog_items
-      WHERE "searchableText" ILIKE ${searchPattern}
-         OR similarity("searchableText", ${query}) > 0.2
-      ORDER BY similarity("searchableText", ${query}) DESC
+      WHERE title ILIKE ${searchPattern}
+         OR word_similarity(${query}, title) > 0.35
+      ORDER BY word_similarity(${query}, title) DESC
       LIMIT ${limit}
     `;
   }
