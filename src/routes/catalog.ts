@@ -17,6 +17,7 @@ router.get("/search", async (req: Request, res: Response, next: NextFunction) =>
     }
 
     const searchPattern = `%${query}%`;
+    const titlePrefixPattern = `${query}%`;
 
     // Use pg_trgm for fuzzy matching on the searchableText column
     // Falls back to ILIKE if similarity is low — covers both exact substring and fuzzy
@@ -32,7 +33,20 @@ router.get("/search", async (req: Request, res: Response, next: NextFunction) =>
             "searchableText" ILIKE ${searchPattern}
             OR word_similarity(${query}, title) > 0.5
           )
-        ORDER BY word_similarity(${query}, platform) DESC, word_similarity(${query}, "searchableText") DESC, word_similarity(${query}, title) DESC
+        ORDER BY
+          CASE
+            WHEN lower(title) = lower(${query}) THEN 100
+            WHEN title ILIKE ${titlePrefixPattern} THEN 90
+            WHEN "searchableText" ILIKE ${searchPattern} THEN 70
+            ELSE 0
+          END DESC,
+          CASE
+            WHEN title ~* '^(Super Mario|Mario|The Legend of Zelda|Zelda|Pokemon|Sonic|Halo|God of War|Final Fantasy|Metroid|Castlevania|Kirby|Donkey Kong|Resident Evil|Silent Hill|Mega Man|Street Fighter|Mortal Kombat|Chrono|EarthBound)' THEN 10
+            ELSE 0
+          END DESC,
+          word_similarity(${query}, title) DESC,
+          word_similarity(${query}, "searchableText") DESC,
+          word_similarity(${query}, platform) DESC
         LIMIT ${limit}
       `;
     } else {
@@ -43,7 +57,20 @@ router.get("/search", async (req: Request, res: Response, next: NextFunction) =>
         FROM catalog_items
         WHERE "searchableText" ILIKE ${searchPattern}
            OR word_similarity(${query}, title) > 0.5
-        ORDER BY word_similarity(${query}, platform) DESC, word_similarity(${query}, "searchableText") DESC, word_similarity(${query}, title) DESC
+        ORDER BY
+          CASE
+            WHEN lower(title) = lower(${query}) THEN 100
+            WHEN title ILIKE ${titlePrefixPattern} THEN 90
+            WHEN "searchableText" ILIKE ${searchPattern} THEN 70
+            ELSE 0
+          END DESC,
+          CASE
+            WHEN title ~* '^(Super Mario|Mario|The Legend of Zelda|Zelda|Pokemon|Sonic|Halo|God of War|Final Fantasy|Metroid|Castlevania|Kirby|Donkey Kong|Resident Evil|Silent Hill|Mega Man|Street Fighter|Mortal Kombat|Chrono|EarthBound)' THEN 10
+            ELSE 0
+          END DESC,
+          word_similarity(${query}, title) DESC,
+          word_similarity(${query}, "searchableText") DESC,
+          word_similarity(${query}, platform) DESC
         LIMIT ${limit}
       `;
     }

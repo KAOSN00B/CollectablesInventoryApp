@@ -10,7 +10,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "catalog:enrich-covers": "node scripts/enrich-game-cover-art.js"
   },
   "keywords": [],
   "author": "",

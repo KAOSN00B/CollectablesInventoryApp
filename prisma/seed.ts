@@ -18,6 +18,7 @@ interface CatalogEntry {
   genre: string | null;
   releaseYear: number | null;
   searchableText: string;
+  imageUrl?: string | null;
 }
 
 function loadCatalogEntries(seedDir: string): CatalogEntry[] {
@@ -83,12 +84,13 @@ async function bulkUpsertCatalogEntries(entries: CatalogEntry[]) {
       ${entry.newValue},
       ${entry.genre},
       ${entry.releaseYear},
-      ${entry.searchableText}
+      ${entry.searchableText},
+      ${entry.imageUrl ?? null}
     )`);
 
     const result = await prisma.$executeRaw`
       INSERT INTO catalog_items
-        (type, title, platform, upc, "looseValue", "cibValue", "newValue", genre, "releaseYear", "searchableText")
+        (type, title, platform, upc, "looseValue", "cibValue", "newValue", genre, "releaseYear", "searchableText", "imageUrl")
       VALUES ${Prisma.join(rows)}
       ON CONFLICT (title, platform) DO UPDATE SET
         type = EXCLUDED.type,
@@ -98,7 +100,8 @@ async function bulkUpsertCatalogEntries(entries: CatalogEntry[]) {
         "newValue" = EXCLUDED."newValue",
         genre = EXCLUDED.genre,
         "releaseYear" = EXCLUDED."releaseYear",
-        "searchableText" = EXCLUDED."searchableText"
+        "searchableText" = EXCLUDED."searchableText",
+        "imageUrl" = COALESCE(EXCLUDED."imageUrl", catalog_items."imageUrl")
     `;
 
     affected += result;
