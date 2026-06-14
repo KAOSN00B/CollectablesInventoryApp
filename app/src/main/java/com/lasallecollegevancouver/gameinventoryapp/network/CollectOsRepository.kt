@@ -84,4 +84,30 @@ class CollectOsRepository {
     suspend fun deleteWishlistItem(publicCode: String, itemId: Int) {
         api.deleteWishlistItem(publicCode, itemId)
     }
+
+    // --- Binders ---
+
+    suspend fun getBinders(publicCode: String): List<Binder> {
+        return api.getBinders(publicCode)
+    }
+
+    suspend fun createBinder(publicCode: String, name: String): Binder {
+        return api.createBinder(publicCode, CreateBinderRequest(name))
+    }
+
+    suspend fun getBinderDetail(publicCode: String, binderId: Int): BinderDetail {
+        return api.getBinderDetail(publicCode, binderId)
+    }
+
+    suspend fun deleteBinder(publicCode: String, binderId: Int) {
+        api.deleteBinder(publicCode, binderId)
+    }
+
+    suspend fun addItemToBinder(publicCode: String, binderId: Int, itemId: Int) {
+        api.addItemToBinder(publicCode, binderId, AddToBinderRequest(itemId))
+    }
+
+    suspend fun removeItemFromBinder(publicCode: String, binderId: Int, itemId: Int) {
+        api.removeItemFromBinder(publicCode, binderId, itemId)
+    }
 }

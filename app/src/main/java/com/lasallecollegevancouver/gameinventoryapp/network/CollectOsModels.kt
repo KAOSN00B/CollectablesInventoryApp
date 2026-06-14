@@ -32,7 +32,16 @@ data class CollectionItem(
     val notes: String?,
     val forTrade: Boolean,
     val createdAt: String,
-    val updatedAt: String
+    val updatedAt: String,
+    // TCG-specific fields — null for game/console items
+    val tcgGame: String? = null,
+    val tcgSet: String? = null,
+    val tcgSetCode: String? = null,
+    val tcgCardNumber: String? = null,
+    val tcgRarity: String? = null,
+    val tcgIsFoil: Boolean? = null,
+    val tcgExternalId: String? = null,
+    val quantity: Int? = null
 )
 
 data class AddItemRequest(
@@ -44,7 +53,18 @@ data class AddItemRequest(
     val purchasePrice: Double,
     val estimatedValue: Double,
     val notes: String?,
-    val forTrade: Boolean
+    val forTrade: Boolean,
+    // TCG-specific fields — omit entirely for game/console items
+    val tcgGame: String? = null,
+    val tcgSet: String? = null,
+    val tcgSetCode: String? = null,
+    val tcgCardNumber: String? = null,
+    val tcgRarity: String? = null,
+    val tcgIsFoil: Boolean? = null,
+    val tcgExternalId: String? = null,
+    val quantity: Int? = null,
+    // Optional — if set, the backend adds this item to the binder automatically
+    val binderId: Int? = null
 )
 
 data class UpdateItemRequest(
@@ -52,7 +72,9 @@ data class UpdateItemRequest(
     val purchasePrice: Double?,
     val estimatedValue: Double?,
     val notes: String?,
-    val forTrade: Boolean?
+    val forTrade: Boolean?,
+    val tcgIsFoil: Boolean? = null,
+    val quantity: Int? = null
 )
 
 // --- Catalog ---
@@ -112,3 +134,26 @@ data class UpdateWishlistRequest(
     val notes: String?,
     val isGrail: Boolean?
 )
+
+// --- Binders ---
+
+data class Binder(
+    val id: Int,
+    val collectionId: Int,
+    val name: String,
+    val createdAt: String,
+    val itemCount: Int = 0,
+    val totalValue: Double = 0.0
+)
+
+data class BinderDetail(
+    val id: Int,
+    val collectionId: Int,
+    val name: String,
+    val createdAt: String,
+    val items: List<CollectionItem> = emptyList()
+)
+
+data class CreateBinderRequest(val name: String)
+
+data class AddToBinderRequest(val itemId: Int)

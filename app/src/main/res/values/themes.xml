@@ -18,6 +18,13 @@
 
     <style name="Theme.GameInventoryApp" parent="Base.Theme.GameInventoryApp" />
 
+    <!-- Splash screen theme — shown during cold start before the first frame renders -->
+    <style name="Theme.CollectOS.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/vault_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.GameInventoryApp</item>
+    </style>
+
     <style name="Widget.Collectos.Card" parent="Widget.Material3.CardView.Elevated">
         <item name="cardCornerRadius">8dp</item>
         <item name="cardBackgroundColor">@color/vault_surface</item>

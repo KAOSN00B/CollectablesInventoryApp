@@ -11,9 +11,11 @@ import androidx.navigation.fragment.findNavController
 import com.lasallecollegevancouver.gameinventoryapp.config.PrefsHelper
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentAddEditConsoleBinding
 import com.lasallecollegevancouver.gameinventoryapp.network.AddItemRequest
+import com.lasallecollegevancouver.gameinventoryapp.network.Binder
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectionItem
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
 import com.lasallecollegevancouver.gameinventoryapp.network.UpdateItemRequest
+import com.lasallecollegevancouver.gameinventoryapp.ui.binders.BinderPickerHelper
 import kotlinx.coroutines.launch
 
 class AddEditConsoleFragment : Fragment() {
@@ -23,15 +25,20 @@ class AddEditConsoleFragment : Fragment() {
 
     private val repository = CollectOsRepository()
     private var existingItem: CollectionItem? = null
+    private var prefillCatalogItemId: Int? = null
 
     private var selectedPlatform = "SNES"
     private var selectedCondition = "CIB"
+    private var selectedBinderId: Int? = null
+    private var loadedBinders: List<Binder> = emptyList()
 
     private val platformOptions = arrayOf(
-        "SNES", "N64", "Game Boy", "Game Boy Color", "GBA", "Virtual Boy",
-        "GameCube", "Switch", "PS1", "PS2", "PS4", "PS5",
+        "NES", "SNES", "N64", "GameCube", "Wii", "Switch",
+        "Game Boy", "Game Boy Color", "GBA", "Virtual Boy", "DS", "3DS",
+        "PS1", "PS2", "PS3", "PS4", "PS5", "PSP",
+        "Xbox", "Xbox 360",
         "Genesis", "Saturn", "Dreamcast",
-        "Atari 2600", "Atari 7800", "Jaguar", "Lynx", "Xbox"
+        "Atari 2600", "Atari 7800", "Jaguar", "Lynx"
     )
     private val conditionOptions = arrayOf("LOOSE", "CIB", "NEW", "POOR")
 
@@ -44,10 +51,49 @@ class AddEditConsoleFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val itemId = arguments?.getInt("itemId", -1) ?: -1
-        if (itemId != -1) loadExistingItem(itemId)
+        if (itemId != -1) {
+            loadExistingItem(itemId)
+        } else {
+            applyPrefill()
+        }
 
         setupDropdowns()
+        setupBinderPicker()
         binding.saveButton.setOnClickListener { saveItem() }
+    }
+
+    private fun setupBinderPicker() {
+        if (existingItem != null) {
+            binding.binderPickerRow.visibility = android.view.View.GONE
+            return
+        }
+
+        val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
+
+        lifecycleScope.launch {
+            try {
+                loadedBinders = repository.getBinders(publicCode)
+            } catch (exception: Exception) {
+                loadedBinders = emptyList()
+            }
+        }
+
+        binding.binderPickerRow.setOnClickListener {
+            BinderPickerHelper.showPicker(
+                context = requireContext(),
+                coroutineScope = lifecycleScope,
+                binders = loadedBinders,
+                publicCode = publicCode,
+                repository = repository,
+                currentBinderId = selectedBinderId
+            ) { binderId, binderName ->
+                selectedBinderId = binderId
+                binding.binderPickerLabel.text = binderName ?: "None"
+                lifecycleScope.launch {
+                    try { loadedBinders = repository.getBinders(publicCode) } catch (_: Exception) {}
+                }
+            }
+        }
     }
 
     private fun setupDropdowns() {
@@ -86,6 +132,33 @@ class AddEditConsoleFragment : Fragment() {
         binding.conditionButton.text = selectedCondition
     }
 
+
+    private fun applyPrefill() {
+        val args = arguments ?: return
+        val prefillTitle = args.getString("prefillTitle") ?: return
+
+        binding.nameInput.setText(prefillTitle)
+        binding.nameInput.isFocusable = false
+        binding.nameInput.isClickable = false
+
+        val prefillPlatform = args.getString("prefillPlatform", "")
+        if (!prefillPlatform.isNullOrEmpty() && platformOptions.contains(prefillPlatform)) {
+            selectedPlatform = prefillPlatform
+        }
+        binding.brandButton.isEnabled = false
+
+        val catalogId = args.getInt("prefillCatalogItemId", -1)
+        if (catalogId != -1) prefillCatalogItemId = catalogId
+
+        val estimatedValue = args.getDouble("prefillCibValue", 0.0).takeIf { it > 0.0 }
+            ?: args.getDouble("prefillLooseValue", 0.0).takeIf { it > 0.0 }
+            ?: args.getDouble("prefillNewValue", 0.0)
+        if (estimatedValue > 0.0) {
+            binding.estimatedValueInput.setText(String.format("%.2f", estimatedValue))
+        }
+
+        updateButtonLabels()
+    }
     private fun loadExistingItem(itemId: Int) {
         val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
         lifecycleScope.launch {
@@ -126,7 +199,7 @@ class AddEditConsoleFragment : Fragment() {
                     repository.addItem(
                         publicCode,
                         AddItemRequest(
-                            catalogItemId = null,
+                            catalogItemId = prefillCatalogItemId,
                             type = "CONSOLE",
                             title = title,
                             platform = selectedPlatform,
@@ -134,7 +207,8 @@ class AddEditConsoleFragment : Fragment() {
                             purchasePrice = purchasePrice,
                             estimatedValue = estimatedValue,
                             notes = notes,
-                            forTrade = false
+                            forTrade = false,
+                            binderId = selectedBinderId
                         )
                     )
                 } else {

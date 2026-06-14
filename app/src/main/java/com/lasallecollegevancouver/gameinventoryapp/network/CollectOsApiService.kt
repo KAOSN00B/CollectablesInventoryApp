@@ -50,7 +50,7 @@ interface CollectOsApiService {
     suspend fun searchCatalog(
         @Query("q") query: String,
         @Query("platform") platform: String? = null,
-        @Query("limit") limit: Int = 20
+        @Query("limit") limit: Int = 50
     ): List<CatalogItem>
 
     @GET("catalog/barcode/{upc}")
@@ -87,5 +87,42 @@ interface CollectOsApiService {
     suspend fun deleteWishlistItem(
         @Path("code") code: String,
         @Path("id") itemId: Int
+    ): Response<Unit>
+
+    // --- Binders ---
+
+    @GET("collections/{code}/binders")
+    suspend fun getBinders(@Path("code") code: String): List<Binder>
+
+    @POST("collections/{code}/binders")
+    suspend fun createBinder(
+        @Path("code") code: String,
+        @Body request: CreateBinderRequest
+    ): Binder
+
+    @GET("collections/{code}/binders/{id}")
+    suspend fun getBinderDetail(
+        @Path("code") code: String,
+        @Path("id") binderId: Int
+    ): BinderDetail
+
+    @DELETE("collections/{code}/binders/{id}")
+    suspend fun deleteBinder(
+        @Path("code") code: String,
+        @Path("id") binderId: Int
+    ): Response<Unit>
+
+    @POST("collections/{code}/binders/{id}/items")
+    suspend fun addItemToBinder(
+        @Path("code") code: String,
+        @Path("id") binderId: Int,
+        @Body request: AddToBinderRequest
+    ): Response<Unit>
+
+    @DELETE("collections/{code}/binders/{id}/items/{itemId}")
+    suspend fun removeItemFromBinder(
+        @Path("code") code: String,
+        @Path("id") binderId: Int,
+        @Path("itemId") itemId: Int
     ): Response<Unit>
 }

@@ -148,7 +148,12 @@ class BarcodeScanFragment : Fragment() {
                     putDouble("prefillCibValue", item.cibValue)
                     putDouble("prefillNewValue", item.newValue)
                 }
-                findNavController().navigate(R.id.action_barcodeScan_to_addEditGame, bundle)
+                val destination = when (item.type) {
+                    "CONSOLE" -> R.id.action_barcodeScan_to_addEditConsole
+                    "COLLECTIBLE" -> R.id.action_barcodeScan_to_addEditCollectible
+                    else -> R.id.action_barcodeScan_to_addEditGame
+                }
+                findNavController().navigate(destination, bundle)
             } else {
                 binding.scanStatusText.text = "No catalog match for barcode: $upc\nTry searching by name instead."
                 // Allow scanning again after a failed lookup

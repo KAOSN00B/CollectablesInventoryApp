@@ -14,12 +14,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.lasallecollegevancouver.gameinventoryapp.R
 import com.lasallecollegevancouver.gameinventoryapp.config.PrefsHelper
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentGameDetailBinding
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectionItem
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
+import com.lasallecollegevancouver.gameinventoryapp.network.RetrofitClient
 import kotlinx.coroutines.launch
 
 class GameDetailFragment : Fragment() {
@@ -28,6 +30,7 @@ class GameDetailFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val repository = CollectOsRepository()
+    private val rawgRepository = RetrofitClient.rawgRepository
     private var currentItem: CollectionItem? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -69,7 +72,10 @@ class GameDetailFragment : Fragment() {
             try {
                 val items = repository.getItems(publicCode)
                 currentItem = items.firstOrNull { it.id == itemId }
-                currentItem?.let { displayItem(it) } ?: findNavController().popBackStack()
+                currentItem?.let {
+                    displayItem(it)
+                    loadCoverArt(it.title)
+                } ?: findNavController().popBackStack()
 
                 // Load community stats if this item came from the catalog
                 currentItem?.catalogItemId?.let { catalogId ->
@@ -83,6 +89,18 @@ class GameDetailFragment : Fragment() {
             } catch (exception: Exception) {
                 findNavController().popBackStack()
             }
+        }
+    }
+
+    private fun loadCoverArt(title: String) {
+        lifecycleScope.launch {
+            val url = rawgRepository.getCoverUrl(title) ?: return@launch
+            if (_binding == null) return@launch
+            binding.detailCoverArt.visibility = View.VISIBLE
+            Glide.with(this@GameDetailFragment)
+                .load(url)
+                .centerCrop()
+                .into(binding.detailCoverArt)
         }
     }
 

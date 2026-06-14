@@ -8,10 +8,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.lasallecollegevancouver.gameinventoryapp.R
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentAiIdentifyBinding
 import com.lasallecollegevancouver.gameinventoryapp.network.CatalogItem
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
+import com.lasallecollegevancouver.gameinventoryapp.network.RetrofitClient
 import kotlinx.coroutines.launch
 
 class AiIdentifyFragment : Fragment() {
@@ -20,14 +22,17 @@ class AiIdentifyFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val repository = CollectOsRepository()
+    private lateinit var resultAdapter: CatalogSearchResultAdapter
     private var selectedPlatform: String? = null
 
     private val platformOptions = arrayOf(
         "Any Platform",
-        "SNES", "N64", "Game Boy", "Game Boy Color", "GBA", "Virtual Boy",
-        "GameCube", "Switch", "PS1", "PS2", "PS4", "PS5",
+        "NES", "SNES", "N64", "GameCube", "Wii", "Switch",
+        "Game Boy", "Game Boy Color", "GBA", "Virtual Boy", "DS", "3DS",
+        "PS1", "PS2", "PS3", "PS4", "PS5", "PSP",
+        "Xbox", "Xbox 360",
         "Genesis", "Saturn", "Dreamcast",
-        "Atari 2600", "Atari 7800", "Jaguar", "Lynx", "Xbox"
+        "Atari 2600", "Atari 7800", "Jaguar", "Lynx"
     )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -37,6 +42,8 @@ class AiIdentifyFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        setupResultsList()
 
         binding.platformFilterButton.setOnClickListener { showPlatformPicker() }
 
@@ -50,6 +57,16 @@ class AiIdentifyFragment : Fragment() {
         }
 
         binding.cancelButton.setOnClickListener { findNavController().popBackStack() }
+    }
+
+    private fun setupResultsList() {
+        resultAdapter = CatalogSearchResultAdapter(
+            rawgRepository = RetrofitClient.rawgRepository,
+            lifecycleScope = viewLifecycleOwner.lifecycleScope,
+            onItemClick = ::navigateWithItem
+        )
+        binding.resultsRecycler.layoutManager = LinearLayoutManager(requireContext())
+        binding.resultsRecycler.adapter = resultAdapter
     }
 
     private fun showPlatformPicker() {
@@ -83,22 +100,11 @@ class AiIdentifyFragment : Fragment() {
         }
     }
 
-    // Results dialog is scrollable by default when the list is long
     private fun showResults(results: List<CatalogItem>) {
-        binding.statusText.visibility = View.GONE
+        binding.statusText.text = "${results.size} results"
+        binding.statusText.visibility = View.VISIBLE
         binding.identifyTextButton.isEnabled = true
-
-        val displayNames = results.map { item ->
-            "${item.title} (${item.platform})"
-        }.toTypedArray()
-
-        AlertDialog.Builder(requireContext())
-            .setTitle("${results.size} results — pick the right one")
-            .setItems(displayNames) { _, index ->
-                navigateWithItem(results[index])
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
+        resultAdapter.submitList(results)
     }
 
     private fun navigateWithItem(item: CatalogItem) {
@@ -110,19 +116,26 @@ class AiIdentifyFragment : Fragment() {
             putDouble("prefillCibValue", item.cibValue)
             putDouble("prefillNewValue", item.newValue)
         }
-        findNavController().navigate(R.id.action_aiIdentify_to_addEditGame, bundle)
+        val destination = when (item.type) {
+            "CONSOLE" -> R.id.action_aiIdentify_to_addEditConsole
+            "COLLECTIBLE" -> R.id.action_aiIdentify_to_addEditCollectible
+            else -> R.id.action_aiIdentify_to_addEditGame
+        }
+        findNavController().navigate(destination, bundle)
     }
 
     private fun showLoading(message: String) {
         binding.statusText.text = message
         binding.statusText.visibility = View.VISIBLE
         binding.identifyTextButton.isEnabled = false
+        resultAdapter.submitList(emptyList())
     }
 
     private fun showError(message: String) {
         binding.statusText.text = message
         binding.statusText.visibility = View.VISIBLE
         binding.identifyTextButton.isEnabled = true
+        resultAdapter.submitList(emptyList())
     }
 
     override fun onDestroyView() {

@@ -46,9 +46,10 @@ class GamesListFragment : Fragment() {
         setupRecyclerView()
 
         binding.fabAddGame.setOnClickListener {
-            SmartAddBottomSheet.newInstance(R.id.action_gamesList_to_addEditGame)
-                .show(parentFragmentManager, "SmartAdd")
+            SmartAddBottomSheet.newInstance().show(parentFragmentManager, "SmartAdd")
         }
+
+        binding.swipeRefresh.setOnRefreshListener { loadGames() }
     }
 
     override fun onResume() {
@@ -83,6 +84,7 @@ class GamesListFragment : Fragment() {
 
     private fun loadGames() {
         val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
+        binding.loadingIndicator.visibility = View.VISIBLE
         lifecycleScope.launch {
             try {
                 // Fetch all items and keep only games
@@ -91,6 +93,9 @@ class GamesListFragment : Fragment() {
             } catch (exception: Exception) {
                 binding.emptyStateText.text = "Could not load games — check your connection"
                 binding.emptyStateText.visibility = View.VISIBLE
+            } finally {
+                binding.loadingIndicator.visibility = View.GONE
+                binding.swipeRefresh.isRefreshing = false
             }
         }
     }

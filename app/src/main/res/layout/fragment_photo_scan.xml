@@ -42,6 +42,32 @@
         android:textAppearance="?attr/textAppearanceBodySmall"
         android:alpha="0.7" />
 
+    <!-- Detected platform row — shown after OCR, tappable to change -->
+    <LinearLayout
+        android:id="@+id/platform_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="12dp"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Console: "
+            android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/platform_button"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Unknown — tap to set" />
+
+    </LinearLayout>
+
     <!-- Editable title field — pre-filled by OCR, user can correct it -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/title_layout"

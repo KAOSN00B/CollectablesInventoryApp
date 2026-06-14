@@ -46,8 +46,7 @@ class CollectiblesListFragment : Fragment() {
 
         // Open Smart Add bottom sheet when the + FAB is tapped
         binding.fabAddCollectible.setOnClickListener {
-            SmartAddBottomSheet.newInstance(R.id.action_collectiblesList_to_addEditCollectible)
-                .show(parentFragmentManager, "SmartAdd")
+            SmartAddBottomSheet.newInstance().show(parentFragmentManager, "SmartAdd")
         }
     }
 

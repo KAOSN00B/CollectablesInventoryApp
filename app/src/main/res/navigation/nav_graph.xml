@@ -12,6 +12,10 @@
     <action android:id="@+id/action_global_addConsole" app:destination="@id/addEditConsoleFragment" />
     <action android:id="@+id/action_global_addCollectible" app:destination="@id/addEditCollectibleFragment" />
     <action android:id="@+id/action_global_wishlist" app:destination="@id/wishlistListFragment" />
+    <action android:id="@+id/action_global_tcgSearch" app:destination="@id/tcgSearchFragment" />
+    <action android:id="@+id/action_global_binders" app:destination="@id/bindersFragment" />
+    <action android:id="@+id/action_global_gameDetail" app:destination="@id/gameDetailFragment" />
+    <action android:id="@+id/action_global_consoleDetail" app:destination="@id/consoleDetailFragment" />
 
     <fragment
         android:id="@+id/onboardingFragment"
@@ -150,6 +154,55 @@
         android:name="com.lasallecollegevancouver.gameinventoryapp.ui.smart_add.PhotoScanFragment"
         android:label="Scan by Photo">
         <action android:id="@+id/action_photoScan_to_addEditGame" app:destination="@id/addEditGameFragment" />
+        <action android:id="@+id/action_photoScan_to_addEditConsole" app:destination="@id/addEditConsoleFragment" />
+        <action android:id="@+id/action_photoScan_to_addEditCollectible" app:destination="@id/addEditCollectibleFragment" />
     </fragment>
+
+    <!-- TCG search screen — selectedGame narrows results to one game or keeps ALL -->
+    <fragment
+        android:id="@+id/tcgSearchFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.tcg.TcgSearchFragment"
+        android:label="Search Cards">
+        <argument
+            android:name="selectedGame"
+            app:argType="string"
+            android:defaultValue="ALL" />
+        <action
+            android:id="@+id/action_tcgSearch_to_tcgCardDetail"
+            app:destination="@id/tcgCardDetailBottomSheet" />
+    </fragment>
+
+    <!-- Card detail bottom sheet — receives a TcgSearchResult parcelable via bundle -->
+    <dialog
+        android:id="@+id/tcgCardDetailBottomSheet"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.tcg.TcgCardDetailBottomSheet"
+        android:label="Add Card" />
+
+    <!-- Binders list screen -->
+    <fragment
+        android:id="@+id/bindersFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.binders.BindersFragment"
+        android:label="Binders">
+        <action
+            android:id="@+id/action_binders_to_binderDetail"
+            app:destination="@id/binderDetailFragment" />
+    </fragment>
+
+    <!-- Binder detail screen — shows all items in one binder -->
+    <fragment
+        android:id="@+id/binderDetailFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.binders.BinderDetailFragment"
+        android:label="Binder">
+        <argument
+            android:name="binderId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+
+    <!-- Settings — top-level destination so the back button never shows on bottom nav -->
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.settings.SettingsFragment"
+        android:label="Settings" />
 
 </navigation>

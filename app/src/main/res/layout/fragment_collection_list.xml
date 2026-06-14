@@ -10,6 +10,28 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/search_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="4dp"
+            app:endIconMode="clear_text"
+            app:startIconDrawable="@android:drawable/ic_menu_search"
+            android:hint="Search your collection…">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/search_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,26 +57,75 @@
             </com.google.android.material.chip.ChipGroup>
         </HorizontalScrollView>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="4dp"
+            android:paddingVertical="2dp">
+
+            <TextView
+                android:id="@+id/summary_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingVertical="4dp"
+                android:textColor="@color/vault_text_muted"
+                android:textAppearance="?attr/textAppearanceBodySmall" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/sort_button"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:paddingHorizontal="8dp"
+                android:text="Sort: Recent"
+                android:textAppearance="?attr/textAppearanceLabelSmall"
+                android:textColor="@color/vault_text_muted" />
+
+        </LinearLayout>
+
         <TextView
-            android:id="@+id/summary_text"
+            android:id="@+id/cached_data_banner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingHorizontal="16dp"
-            android:paddingVertical="6dp"
-            android:textColor="@color/vault_text_muted"
-            android:textAppearance="?attr/textAppearanceBodySmall" />
+            android:paddingBottom="4dp"
+            android:text="Showing cached data — pull to refresh"
+            android:textColor="@color/vault_primary"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            android:visibility="gone" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/collection_recycler_view"
+            <!-- Shown while data is loading -->
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/loading_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <!-- Pull-to-refresh wrapping the collection list -->
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipe_refresh"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingBottom="88dp" />
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/collection_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:paddingBottom="88dp" />
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
             <LinearLayout
                 android:id="@+id/empty_state"

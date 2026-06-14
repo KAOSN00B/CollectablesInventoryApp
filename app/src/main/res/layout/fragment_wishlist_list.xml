@@ -1,32 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/vault_background">
 
-    <TextView
-        android:id="@+id/empty_state_text"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/search_input_layout"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Your wishlist is empty — tap + to add an item"
-        android:textAppearance="?attr/textAppearanceBodyLarge"
-        android:gravity="center"
-        android:layout_margin="32dp"
-        android:visibility="gone" />
+        android:paddingHorizontal="12dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="4dp"
+        app:endIconMode="clear_text"
+        app:startIconDrawable="@android:drawable/ic_menu_search"
+        android:hint="Search wishlist…">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/wishlist_recycler_view"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/search_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="80dp" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_wishlist_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:contentDescription="Add wishlist item"
-        android:src="@android:drawable/ic_input_add" />
+        <!-- Shown while data is loading -->
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/loading_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
 
-</FrameLayout>
+        <TextView
+            android:id="@+id/empty_state_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Your wishlist is empty — tap + to add an item"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:gravity="center"
+            android:layout_margin="32dp"
+            android:visibility="gone" />
+
+        <!-- Pull-to-refresh wrapping the wishlist -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/wishlist_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="80dp" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_add_wishlist_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:contentDescription="Add wishlist item"
+            android:src="@android:drawable/ic_input_add" />
+
+    </FrameLayout>
+
+</LinearLayout>

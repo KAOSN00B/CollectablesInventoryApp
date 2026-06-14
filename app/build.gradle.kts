@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+apply(plugin = "kotlin-parcelize")
+
 android {
     namespace = "com.lasallecollegevancouver.gameinventoryapp"
     compileSdk {
@@ -29,11 +31,19 @@ android {
         // Inject API key as a BuildConfig constant — access as BuildConfig.PRICE_CHARTING_API_KEY
         buildConfigField("String", "PRICE_CHARTING_API_KEY",
             "\"${localProperties.getProperty("priceChartingApiKey", "")}\"")
+
+        // Pokémon TCG API key — stored in local.properties, never committed
+        buildConfigField("String", "POKEMON_TCG_API_KEY",
+            "\"${localProperties.getProperty("pokemonTcgApiKey", "")}\"")
+
+        // RAWG.io API key — game cover art and metadata
+        buildConfigField("String", "RAWG_API_KEY",
+            "\"${localProperties.getProperty("rawgApiKey", "")}\"")
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -89,6 +99,16 @@ dependencies {
     // ML Kit — barcode scanning and photo OCR
     implementation(libs.mlkit.barcode)
     implementation(libs.mlkit.text.recognition)
+
+    // Glide — image loading for TCG card artwork
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
+    // Splash screen API — shows themed launch screen before first frame
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
+    // Pull-to-refresh on list screens
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

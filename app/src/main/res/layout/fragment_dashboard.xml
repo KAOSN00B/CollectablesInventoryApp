@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/vault_background">
+
+    <!-- Shown while dashboard data is loading -->
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/loading_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -57,7 +69,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="8dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_scan"
@@ -83,6 +95,14 @@
                 android:text="Add" />
         </LinearLayout>
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/button_binders"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="View Binders" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -91,20 +111,131 @@
             android:textAppearance="?attr/textAppearanceTitleMedium"
             android:layout_marginBottom="8dp" />
 
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="16dp">
-            <TextView android:id="@+id/games_category_value" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/vault_text" android:textAppearance="?attr/textAppearanceBodyLarge" />
-            <TextView android:id="@+id/games_category_count" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/vault_text_muted" android:textAppearance="?attr/textAppearanceBodySmall" />
-            <TextView android:id="@+id/consoles_category_value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textColor="@color/vault_text" android:textAppearance="?attr/textAppearanceBodyLarge" />
-            <TextView android:id="@+id/consoles_category_count" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/vault_text_muted" android:textAppearance="?attr/textAppearanceBodySmall" />
-            <TextView android:id="@+id/comics_category_value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textColor="@color/vault_text" android:textAppearance="?attr/textAppearanceBodyLarge" />
-            <TextView android:id="@+id/comics_category_count" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/vault_text_muted" android:textAppearance="?attr/textAppearanceBodySmall" />
-            <TextView android:id="@+id/tcg_category_value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textColor="@color/vault_text" android:textAppearance="?attr/textAppearanceBodyLarge" />
-            <TextView android:id="@+id/tcg_category_count" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/vault_text_muted" android:textAppearance="?attr/textAppearanceBodySmall" />
-            <TextView android:id="@+id/toys_category_value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textColor="@color/vault_text" android:textAppearance="?attr/textAppearanceBodyLarge" />
-            <TextView android:id="@+id/toys_category_count" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/vault_text_muted" android:textAppearance="?attr/textAppearanceBodySmall" />
-            <TextView android:id="@+id/lego_category_value" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textColor="@color/vault_text" android:textAppearance="?attr/textAppearanceBodyLarge" />
-            <TextView android:id="@+id/lego_category_count" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/vault_text_muted" android:textAppearance="?attr/textAppearanceBodySmall" />
-        </LinearLayout>
+        <!-- Video Games card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="@color/vault_surface"
+            app:strokeColor="@color/vault_outline"
+            app:strokeWidth="1dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="Video Games"
+                        android:textColor="@color/vault_text" android:textAppearance="?attr/textAppearanceTitleSmall" />
+                    <TextView android:id="@+id/games_category_value" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:textColor="@color/vault_secondary"
+                        android:textStyle="bold" android:textAppearance="?attr/textAppearanceTitleSmall" />
+                </LinearLayout>
+                <TextView android:id="@+id/games_category_count" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="2dp"
+                    android:textColor="@color/vault_text_muted" android:textAppearance="?attr/textAppearanceBodySmall" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Trading Cards card with per-game breakdown -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/tcg_card_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="@color/vault_surface"
+            app:strokeColor="@color/vault_outline"
+            app:strokeWidth="1dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="Trading Cards"
+                        android:textColor="@color/vault_text" android:textAppearance="?attr/textAppearanceTitleSmall" />
+                    <TextView android:id="@+id/tcg_category_value" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:textColor="@color/vault_secondary"
+                        android:textStyle="bold" android:textAppearance="?attr/textAppearanceTitleSmall" />
+                </LinearLayout>
+                <TextView android:id="@+id/tcg_category_count" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="2dp"
+                    android:textColor="@color/vault_text_muted" android:textAppearance="?attr/textAppearanceBodySmall" />
+                <!-- Per-game breakdown rows -->
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:layout_marginTop="10dp" android:layout_marginBottom="8dp"
+                    android:background="@color/vault_outline" />
+                <LinearLayout android:id="@+id/tcg_mtg_row" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="horizontal"
+                    android:layout_marginBottom="4dp" android:visibility="gone">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="  ↳ MTG"
+                        android:textColor="@color/vault_text_muted" android:textAppearance="?attr/textAppearanceBodySmall" />
+                    <TextView android:id="@+id/tcg_mtg_value" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:textColor="@color/vault_text_muted"
+                        android:textAppearance="?attr/textAppearanceBodySmall" />
+                </LinearLayout>
+                <LinearLayout android:id="@+id/tcg_pokemon_row" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="horizontal"
+                    android:layout_marginBottom="4dp" android:visibility="gone">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="  ↳ Pokémon"
+                        android:textColor="@color/vault_text_muted" android:textAppearance="?attr/textAppearanceBodySmall" />
+                    <TextView android:id="@+id/tcg_pokemon_value" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:textColor="@color/vault_text_muted"
+                        android:textAppearance="?attr/textAppearanceBodySmall" />
+                </LinearLayout>
+                <LinearLayout android:id="@+id/tcg_yugioh_row" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:orientation="horizontal"
+                    android:visibility="gone">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="  ↳ Yu-Gi-Oh!"
+                        android:textColor="@color/vault_text_muted" android:textAppearance="?attr/textAppearanceBodySmall" />
+                    <TextView android:id="@+id/tcg_yugioh_value" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:textColor="@color/vault_text_muted"
+                        android:textAppearance="?attr/textAppearanceBodySmall" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Collectibles card (hidden until items added) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/collectibles_card_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="@color/vault_surface"
+            app:strokeColor="@color/vault_outline"
+            app:strokeWidth="1dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:orientation="vertical" android:padding="16dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content"
+                        android:layout_weight="1" android:text="Collectibles"
+                        android:textColor="@color/vault_text" android:textAppearance="?attr/textAppearanceTitleSmall" />
+                    <TextView android:id="@+id/collectibles_category_value" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:textColor="@color/vault_secondary"
+                        android:textStyle="bold" android:textAppearance="?attr/textAppearanceTitleSmall" />
+                </LinearLayout>
+                <TextView android:id="@+id/collectibles_category_count" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:layout_marginTop="2dp"
+                    android:textColor="@color/vault_text_muted" android:textAppearance="?attr/textAppearanceBodySmall" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Hidden legacy IDs kept for reference, not shown -->
+        <TextView android:id="@+id/consoles_category_value" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
+        <TextView android:id="@+id/consoles_category_count" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
+        <TextView android:id="@+id/comics_category_value" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
+        <TextView android:id="@+id/comics_category_count" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
+        <TextView android:id="@+id/toys_category_value" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
+        <TextView android:id="@+id/toys_category_count" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
+        <TextView android:id="@+id/lego_category_value" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
+        <TextView android:id="@+id/lego_category_count" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" />
 
         <TextView
             android:id="@+id/wishlist_count"
@@ -114,10 +245,36 @@
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:layout_marginBottom="16dp" />
 
+        <!-- Platform completion tracker — shows owned vs total per platform -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Recently Added Games"
+            android:text="Platform Completion"
+            android:textColor="@color/vault_text"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/completion_empty_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add games to see your completion progress"
+            android:textColor="@color/vault_text_muted"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/platform_completion_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recently Added"
             android:textColor="@color/vault_text"
             android:textAppearance="?attr/textAppearanceTitleMedium"
             android:layout_marginBottom="8dp" />
@@ -128,6 +285,18 @@
             android:layout_height="wrap_content"
             android:textColor="@color/vault_text_muted"
             android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:lineSpacingMultiplier="1.4" />
+            android:lineSpacingMultiplier="1.4"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Share collection link -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/share_collection_button"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Share My Collection" />
+
     </LinearLayout>
-</ScrollView>
+    </ScrollView>
+
+</FrameLayout>

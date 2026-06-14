@@ -39,9 +39,10 @@ class ConsolesListFragment : Fragment() {
         binding.consolesRecyclerView.adapter = consoleAdapter
 
         binding.fabAddConsole.setOnClickListener {
-            SmartAddBottomSheet.newInstance(R.id.action_consolesList_to_addEditConsole)
-                .show(parentFragmentManager, "SmartAdd")
+            SmartAddBottomSheet.newInstance().show(parentFragmentManager, "SmartAdd")
         }
+
+        binding.swipeRefresh.setOnRefreshListener { loadConsoles() }
     }
 
     override fun onResume() {
@@ -51,6 +52,7 @@ class ConsolesListFragment : Fragment() {
 
     private fun loadConsoles() {
         val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
+        binding.loadingIndicator.visibility = View.VISIBLE
         lifecycleScope.launch {
             try {
                 val consoles = repository.getItems(publicCode).filter { it.type == "CONSOLE" }
@@ -58,6 +60,9 @@ class ConsolesListFragment : Fragment() {
                 binding.emptyStateText.visibility = if (consoles.isEmpty()) View.VISIBLE else View.GONE
             } catch (exception: Exception) {
                 binding.emptyStateText.visibility = View.VISIBLE
+            } finally {
+                binding.loadingIndicator.visibility = View.GONE
+                binding.swipeRefresh.isRefreshing = false
             }
         }
     }

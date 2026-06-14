@@ -11,9 +11,11 @@ import androidx.navigation.fragment.findNavController
 import com.lasallecollegevancouver.gameinventoryapp.config.PrefsHelper
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentAddEditGameBinding
 import com.lasallecollegevancouver.gameinventoryapp.network.AddItemRequest
+import com.lasallecollegevancouver.gameinventoryapp.network.Binder
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectionItem
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
 import com.lasallecollegevancouver.gameinventoryapp.network.UpdateItemRequest
+import com.lasallecollegevancouver.gameinventoryapp.ui.binders.BinderPickerHelper
 import kotlinx.coroutines.launch
 
 class AddEditGameFragment : Fragment() {
@@ -29,16 +31,20 @@ class AddEditGameFragment : Fragment() {
     private var catalogLooseValue = 0.0
     private var catalogCibValue = 0.0
     private var catalogNewValue = 0.0
-    private var hasCalogPrices = false
+    private var hasCatalogPrices = false
 
     private var selectedPlatform = "SNES"
     private var selectedCondition = "CIB"
+    private var selectedBinderId: Int? = null
+    private var loadedBinders: List<Binder> = emptyList()
 
     private val platformOptions = arrayOf(
-        "SNES", "N64", "Game Boy", "Game Boy Color", "GBA", "Virtual Boy",
-        "GameCube", "Switch", "PS1", "PS2", "PS4", "PS5",
+        "NES", "SNES", "N64", "GameCube", "Wii", "Switch",
+        "Game Boy", "Game Boy Color", "GBA", "Virtual Boy", "DS", "3DS",
+        "PS1", "PS2", "PS3", "PS4", "PS5", "PSP",
+        "Xbox", "Xbox 360",
         "Genesis", "Saturn", "Dreamcast",
-        "Atari 2600", "Atari 7800", "Jaguar", "Lynx", "Xbox"
+        "Atari 2600", "Atari 7800", "Jaguar", "Lynx"
     )
     private val conditionOptions = arrayOf("LOOSE", "CIB", "NEW", "POOR")
 
@@ -58,7 +64,44 @@ class AddEditGameFragment : Fragment() {
         }
 
         setupDropdowns()
+        setupBinderPicker()
         binding.saveButton.setOnClickListener { saveItem() }
+    }
+
+    private fun setupBinderPicker() {
+        // Hide the binder row when editing an existing item — binder assignment is only for new items
+        if (existingItem != null) {
+            binding.binderPickerRow.visibility = android.view.View.GONE
+            return
+        }
+
+        val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
+
+        // Pre-load binders in the background so they appear instantly when the user taps
+        lifecycleScope.launch {
+            try {
+                loadedBinders = repository.getBinders(publicCode)
+            } catch (exception: Exception) {
+                loadedBinders = emptyList()
+            }
+        }
+
+        binding.binderPickerRow.setOnClickListener {
+            BinderPickerHelper.showPicker(
+                context = requireContext(),
+                coroutineScope = lifecycleScope,
+                binders = loadedBinders,
+                publicCode = publicCode,
+                repository = repository,
+                currentBinderId = selectedBinderId
+            ) { binderId, binderName ->
+                selectedBinderId = binderId
+                binding.binderPickerLabel.text = binderName ?: "None"
+                lifecycleScope.launch {
+                    try { loadedBinders = repository.getBinders(publicCode) } catch (_: Exception) {}
+                }
+            }
+        }
     }
 
     private fun setupDropdowns() {
@@ -74,8 +117,7 @@ class AddEditGameFragment : Fragment() {
             showSelectionDialog("Condition", conditionOptions, selectedCondition) { chosen ->
                 selectedCondition = chosen
                 binding.conditionButton.text = selectedCondition
-                // Auto-update estimated value when condition changes and we have catalog prices
-                if (hasCalogPrices) updateEstimatedValueFromCondition()
+                if (hasCatalogPrices) updateEstimatedValueFromCondition()
             }
         }
     }
@@ -98,10 +140,8 @@ class AddEditGameFragment : Fragment() {
 
     private fun applyPrefill() {
         val args = arguments ?: return
-
         val prefillTitle = args.getString("prefillTitle") ?: return
 
-        // Lock title and platform — these come from the catalog and should not be changed
         binding.titleInput.setText(prefillTitle)
         binding.titleInput.isFocusable = false
         binding.titleInput.isClickable = false
@@ -112,11 +152,10 @@ class AddEditGameFragment : Fragment() {
         }
         binding.platformButton.isEnabled = false
 
-        // Store catalog prices so condition changes auto-update the estimated value
         catalogLooseValue = args.getDouble("prefillLooseValue", 0.0)
         catalogCibValue = args.getDouble("prefillCibValue", 0.0)
         catalogNewValue = args.getDouble("prefillNewValue", 0.0)
-        hasCalogPrices = catalogCibValue > 0.0
+        hasCatalogPrices = catalogCibValue > 0.0
 
         val catalogId = args.getInt("prefillCatalogItemId", -1)
         if (catalogId != -1) prefillCatalogItemId = catalogId
@@ -125,7 +164,6 @@ class AddEditGameFragment : Fragment() {
         updateEstimatedValueFromCondition()
     }
 
-    // Maps the selected condition to the matching catalog price
     private fun updateEstimatedValueFromCondition() {
         val value = when (selectedCondition) {
             "LOOSE" -> catalogLooseValue
@@ -150,6 +188,8 @@ class AddEditGameFragment : Fragment() {
                     binding.platformButton.isEnabled = false
                     binding.purchasePriceInput.setText(item.purchasePrice.toString())
                     binding.estimatedValueInput.setText(item.estimatedValue.toString())
+                    binding.forTradeSwitch.isChecked = item.forTrade
+                    binding.notesInput.setText(item.notes ?: "")
                     selectedPlatform = item.platform
                     selectedCondition = item.condition
                     updateButtonLabels()
@@ -170,38 +210,96 @@ class AddEditGameFragment : Fragment() {
         val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
         val purchasePrice = binding.purchasePriceInput.text.toString().toDoubleOrNull() ?: 0.0
         val estimatedValue = binding.estimatedValueInput.text.toString().toDoubleOrNull() ?: 0.0
+        val forTrade = binding.forTradeSwitch.isChecked
+        val notes = binding.notesInput.text.toString().trim().ifEmpty { null }
 
+        // Only check for duplicates when adding a new item, not when editing
+        if (existingItem == null) {
+            binding.saveButton.isEnabled = false
+            lifecycleScope.launch {
+                try {
+                    val existingItems = repository.getItems(publicCode)
+                    val duplicate = findDuplicate(existingItems, title, selectedPlatform)
+                    if (duplicate != null) {
+                        binding.saveButton.isEnabled = true
+                        showDuplicateWarning(duplicate.title, duplicate.platform) {
+                            // User chose to add anyway
+                            performSave(publicCode, title, purchasePrice, estimatedValue, notes, forTrade)
+                        }
+                    } else {
+                        performSave(publicCode, title, purchasePrice, estimatedValue, notes, forTrade)
+                    }
+                } catch (exception: Exception) {
+                    performSave(publicCode, title, purchasePrice, estimatedValue, notes, forTrade)
+                }
+            }
+        } else {
+            binding.saveButton.isEnabled = false
+            performUpdate(publicCode, purchasePrice, estimatedValue, notes, forTrade)
+        }
+    }
+
+    // Checks if the collection already has this game by catalogItemId (preferred) or title+platform
+    private fun findDuplicate(items: List<CollectionItem>, title: String, platform: String): CollectionItem? {
+        val catalogId = prefillCatalogItemId
+        if (catalogId != null) {
+            return items.firstOrNull { it.catalogItemId == catalogId }
+        }
+        return items.firstOrNull {
+            it.title.equals(title, ignoreCase = true) && it.platform.equals(platform, ignoreCase = true)
+        }
+    }
+
+    private fun showDuplicateWarning(title: String, platform: String, onAddAnyway: () -> Unit) {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Already in Collection")
+            .setMessage("You already own $title ($platform). Add another copy anyway?")
+            .setPositiveButton("Add Anyway") { _, _ -> onAddAnyway() }
+            .setNegativeButton("Cancel") { _, _ -> }
+            .show()
+    }
+
+    private fun performSave(publicCode: String, title: String, purchasePrice: Double, estimatedValue: Double, notes: String?, forTrade: Boolean) {
         binding.saveButton.isEnabled = false
         lifecycleScope.launch {
             try {
-                if (existingItem == null) {
-                    repository.addItem(
-                        publicCode,
-                        AddItemRequest(
-                            catalogItemId = prefillCatalogItemId,
-                            type = "GAME",
-                            title = title,
-                            platform = selectedPlatform,
-                            condition = selectedCondition,
-                            purchasePrice = purchasePrice,
-                            estimatedValue = estimatedValue,
-                            notes = null,
-                            forTrade = false
-                        )
+                repository.addItem(
+                    publicCode,
+                    AddItemRequest(
+                        catalogItemId = prefillCatalogItemId,
+                        type = "GAME",
+                        title = title,
+                        platform = selectedPlatform,
+                        condition = selectedCondition,
+                        purchasePrice = purchasePrice,
+                        estimatedValue = estimatedValue,
+                        notes = notes,
+                        forTrade = forTrade,
+                        binderId = selectedBinderId
                     )
-                } else {
-                    repository.updateItem(
-                        publicCode,
-                        existingItem!!.id,
-                        UpdateItemRequest(
-                            condition = selectedCondition,
-                            purchasePrice = purchasePrice,
-                            estimatedValue = existingItem!!.estimatedValue,
-                            notes = null,
-                            forTrade = existingItem!!.forTrade
-                        )
+                )
+                findNavController().popBackStack()
+            } catch (exception: Exception) {
+                binding.saveButton.isEnabled = true
+                binding.titleInput.error = "Could not save — check your connection"
+            }
+        }
+    }
+
+    private fun performUpdate(publicCode: String, purchasePrice: Double, estimatedValue: Double, notes: String?, forTrade: Boolean) {
+        lifecycleScope.launch {
+            try {
+                repository.updateItem(
+                    publicCode,
+                    existingItem!!.id,
+                    UpdateItemRequest(
+                        condition = selectedCondition,
+                        purchasePrice = purchasePrice,
+                        estimatedValue = estimatedValue,
+                        notes = notes,
+                        forTrade = forTrade
                     )
-                }
+                )
                 findNavController().popBackStack()
             } catch (exception: Exception) {
                 binding.saveButton.isEnabled = true

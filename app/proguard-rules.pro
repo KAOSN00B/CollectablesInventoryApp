@@ -1,21 +1,39 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Keep source file names and line numbers so crash stack traces are readable
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# --- Gson / JSON models ---
+# Gson uses reflection to read field names from data classes.
+# Without this, R8 renames the fields and JSON parsing silently returns nulls.
+-keep class com.lasallecollegevancouver.gameinventoryapp.network.** { *; }
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# --- Retrofit ---
+-keepattributes Signature
+-keepattributes *Annotation*
+-keep class retrofit2.** { *; }
+-keepclassmembernames interface * {
+    @retrofit2.http.* <methods>;
+}
+-dontwarn retrofit2.**
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# --- OkHttp / Okio ---
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-keep class okhttp3.internal.publicsuffix.PublicSuffixDatabase { *; }
+
+# --- Room ---
+-keep class * extends androidx.room.RoomDatabase { *; }
+-keep @androidx.room.Entity class * { *; }
+-keepclassmembers @androidx.room.Entity class * { *; }
+-keep @androidx.room.Dao interface * { *; }
+
+# --- Kotlin Parcelize ---
+-keep class * implements android.os.Parcelable {
+    public static final android.os.Parcelable$Creator *;
+}
+
+# --- Navigation Component safe args ---
+-keep class * extends androidx.navigation.NavArgs { *; }
