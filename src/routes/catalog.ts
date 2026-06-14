@@ -41,7 +41,8 @@ router.get("/search", async (req: Request, res: Response, next: NextFunction) =>
             ELSE 0
           END DESC,
           CASE
-            WHEN title ~* '^(Super Mario|Mario|The Legend of Zelda|Zelda|Pokemon|Sonic|Halo|God of War|Final Fantasy|Metroid|Castlevania|Kirby|Donkey Kong|Resident Evil|Silent Hill|Mega Man|Street Fighter|Mortal Kombat|Chrono|EarthBound)' THEN 10
+            WHEN title ~* '^(Sonic the Hedgehog|Sonic Adventure|Sonic Advance|Sonic Generations|Sonic Mania|Sonic Colors|Sonic Unleashed|Sonic Heroes|Sonic Riders|Sonic R$|Sonic Jam|Sonic 3D Blast|Sonic CD|Sonic Spinball|Sonic Boom)' THEN 25
+            WHEN title ~* '^(Super Mario|Mario|The Legend of Zelda|Zelda|Pokemon|Halo|God of War|Final Fantasy|Metroid|Castlevania|Kirby|Donkey Kong|Resident Evil|Silent Hill|Mega Man|Street Fighter|Mortal Kombat|Chrono|EarthBound)' THEN 10
             ELSE 0
           END DESC,
           word_similarity(${query}, title) DESC,
@@ -65,7 +66,8 @@ router.get("/search", async (req: Request, res: Response, next: NextFunction) =>
             ELSE 0
           END DESC,
           CASE
-            WHEN title ~* '^(Super Mario|Mario|The Legend of Zelda|Zelda|Pokemon|Sonic|Halo|God of War|Final Fantasy|Metroid|Castlevania|Kirby|Donkey Kong|Resident Evil|Silent Hill|Mega Man|Street Fighter|Mortal Kombat|Chrono|EarthBound)' THEN 10
+            WHEN title ~* '^(Sonic the Hedgehog|Sonic Adventure|Sonic Advance|Sonic Generations|Sonic Mania|Sonic Colors|Sonic Unleashed|Sonic Heroes|Sonic Riders|Sonic R$|Sonic Jam|Sonic 3D Blast|Sonic CD|Sonic Spinball|Sonic Boom)' THEN 25
+            WHEN title ~* '^(Super Mario|Mario|The Legend of Zelda|Zelda|Pokemon|Halo|God of War|Final Fantasy|Metroid|Castlevania|Kirby|Donkey Kong|Resident Evil|Silent Hill|Mega Man|Street Fighter|Mortal Kombat|Chrono|EarthBound)' THEN 10
             ELSE 0
           END DESC,
           word_similarity(${query}, title) DESC,
