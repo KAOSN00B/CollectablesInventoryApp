@@ -45,7 +45,26 @@ class FriendCollectionFragment : Fragment() {
 
                 // Header
                 binding.friendNameText.text = collection.displayName ?: "Friend's Collection"
-                binding.friendItemCountText.text = "${allItems.size} items in collection"
+                val totalValue = allItems.sumOf { it.estimatedValue }
+                binding.friendItemCountText.text =
+                    "${allItems.size} items · \$${String.format("%.2f", totalValue)} total value"
+
+                // All items — grouped by type so games appear first, then TCG cards, etc.
+                binding.allItemsText.text = if (allItems.isEmpty()) {
+                    "No items in this collection yet"
+                } else {
+                    val order = listOf("GAME", "CONSOLE", "TCG", "COLLECTIBLE")
+                    allItems.sortedWith(compareBy(
+                        { order.indexOf(it.type).takeIf { i -> i >= 0 } ?: Int.MAX_VALUE },
+                        { it.title }
+                    )).joinToString("\n") { item ->
+                        val value = if (item.estimatedValue > 0) {
+                            " — \$${String.format("%.2f", item.estimatedValue)}"
+                        } else ""
+                        val tradeFlag = if (item.forTrade) " 🔄" else ""
+                        "${item.title} (${item.platform}) · ${item.condition}$value$tradeFlag"
+                    }
+                }
 
                 // For Trade — items the friend has marked as available for trade
                 val forTradeItems = allItems.filter { it.forTrade }
@@ -65,7 +84,7 @@ class FriendCollectionFragment : Fragment() {
                     "No binders yet"
                 } else {
                     binders.joinToString("\n") { binder ->
-                        val itemLabel = if (binder.itemCount == 1) "1 card" else "${binder.itemCount} cards"
+                        val itemLabel = if (binder.itemCount == 1) "1 item" else "${binder.itemCount} items"
                         "• ${binder.name}  ($itemLabel)"
                     }
                 }
@@ -80,6 +99,7 @@ class FriendCollectionFragment : Fragment() {
     private fun showError(message: String) {
         binding.friendNameText.text = message
         binding.friendItemCountText.text = ""
+        binding.allItemsText.text = "—"
         binding.forTradeText.text = "—"
         binding.bindersText.text = "—"
         binding.loadingIndicator.visibility = View.GONE

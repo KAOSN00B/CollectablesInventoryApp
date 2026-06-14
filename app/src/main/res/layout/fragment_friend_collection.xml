@@ -59,6 +59,37 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- All items section -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="ALL ITEMS"
+                android:textAppearance="?attr/textAppearanceLabelMedium"
+                android:textColor="@color/vault_text_muted"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="8dp"
+                android:layout_marginStart="4dp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardBackgroundColor="@color/vault_surface"
+                app:cardCornerRadius="12dp"
+                app:strokeColor="@color/vault_outline"
+                app:strokeWidth="1dp">
+
+                <TextView
+                    android:id="@+id/all_items_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="@color/vault_text"
+                    android:lineSpacingMultiplier="1.5" />
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- For Trade section -->
             <TextView
                 android:layout_width="match_parent"
