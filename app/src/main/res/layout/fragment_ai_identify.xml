@@ -1,89 +1,194 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center_horizontal">
+    android:background="@color/vault_background">
 
-    <TextView
+    <!-- Teal hero header with search bar -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Search Catalog"
-        android:textAppearance="?attr/textAppearanceHeadlineSmall"
-        android:layout_marginBottom="8dp" />
+        android:orientation="vertical"
+        android:background="@color/vault_primary"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Type a game name to search the catalog. Filter by platform to narrow results."
-        android:textAppearance="?attr/textAppearanceBodyMedium"
-        android:alpha="0.7"
-        android:layout_marginBottom="24dp" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Game name (e.g. Sonic, Mario, Zelda)"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-        android:layout_marginBottom="12dp">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/description_input"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:imeOptions="actionSearch"
-            android:maxLines="1" />
+            android:text="PRICE CATALOG"
+            android:textColor="@color/vault_on_primary"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            android:letterSpacing="0.12"
+            android:layout_marginBottom="4dp" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Find Games &amp; Check Prices"
+            android:textColor="@color/vault_on_primary"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:layout_marginBottom="16dp" />
 
-    <TextView
+        <!-- Shared search input -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search…"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            app:boxBackgroundColor="#33002021"
+            app:boxStrokeColor="@color/vault_on_primary"
+            app:hintTextColor="@color/vault_on_primary">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/description_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/vault_on_primary"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:maxLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <!-- Mode + filter controls (below the teal block) -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Platform (optional)"
-        android:textSize="12sp"
-        android:textColor="?attr/colorOnSurfaceVariant"
-        android:layout_marginBottom="4dp" />
+        android:orientation="vertical"
+        android:background="@color/vault_surface"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="12dp">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/platform_filter_button"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:gravity="start|center_vertical"
-        android:paddingStart="16dp"
-        android:text="Any Platform" />
+        <!-- Mode switch: Games / Trading Cards -->
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/mode_chip_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            app:singleSelection="true"
+            app:selectionRequired="true">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/identify_text_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Search"
-        android:layout_marginBottom="16dp" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mode_games"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Games"
+                android:checked="true" />
 
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mode_tcg"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trading Cards" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Games mode: platform picker -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/platform_filter_button"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="start|center_vertical"
+            android:paddingStart="16dp"
+            android:text="Any Platform" />
+
+        <!-- TCG mode: game filter chips (hidden until Trading Cards selected) -->
+        <HorizontalScrollView
+            android:id="@+id/tcg_game_filter_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/tcg_game_chips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tcg_all"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All Cards"
+                    android:checked="true" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tcg_mtg"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MTG" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tcg_pokemon"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pokémon" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tcg_yugioh"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Yu-Gi-Oh!" />
+
+            </com.google.android.material.chip.ChipGroup>
+
+        </HorizontalScrollView>
+
+        <!-- Search button (shared for both modes) -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/identify_text_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Search" />
+
+    </LinearLayout>
+
+    <!-- Status message -->
     <TextView
         android:id="@+id/status_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?attr/textAppearanceBodyMedium"
-        android:gravity="center"
-        android:visibility="gone"
-        android:layout_marginBottom="16dp" />
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="4dp"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textColor="@color/vault_text_muted"
+        android:visibility="gone" />
 
+    <!-- Results (catalog items or TCG cards depending on mode) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/results_recycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
-        android:paddingBottom="12dp" />
+        android:paddingBottom="16dp" />
+
+    <!-- Hidden — kept so ViewBinding compiles; cancel is irrelevant on a tab -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/cancel_button"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cancel"
-        style="@style/Widget.Material3.Button.TextButton" />
+        android:visibility="gone"
+        android:text="Cancel" />
 
 </LinearLayout>

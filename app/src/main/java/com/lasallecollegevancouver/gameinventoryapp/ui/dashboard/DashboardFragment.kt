@@ -13,14 +13,13 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.lasallecollegevancouver.gameinventoryapp.R
 import com.lasallecollegevancouver.gameinventoryapp.config.AppConfig
 import com.lasallecollegevancouver.gameinventoryapp.config.PrefsHelper
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentDashboardBinding
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
-import com.lasallecollegevancouver.gameinventoryapp.network.PlatformCount
 import com.lasallecollegevancouver.gameinventoryapp.ui.smart_add.SmartAddBottomSheet
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class DashboardFragment : Fragment() {
@@ -46,8 +45,6 @@ class DashboardFragment : Fragment() {
         binding.shareCollectionButton.setOnClickListener { showShareDialog() }
         binding.buttonBinders.setOnClickListener { findNavController().navigate(R.id.action_global_binders) }
 
-        binding.platformCompletionList.layoutManager = LinearLayoutManager(requireContext())
-
         // TCG and Collectibles sections are hidden until items of those types exist
     }
 
@@ -61,116 +58,101 @@ class DashboardFragment : Fragment() {
         binding.loadingIndicator.visibility = View.VISIBLE
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val allItems = repository.getItems(publicCode)
-                val wishlistItems = repository.getWishlist(publicCode)
-                val catalogPlatformCounts = repository.getPlatformCounts()
-
-                val games = allItems.filter { it.type == "GAME" }
-                val consoles = allItems.filter { it.type == "CONSOLE" }
-                val tcgCards = allItems.filter { it.type == "TCG" }
-                val collectibles = allItems.filter { it.type == "COLLECTIBLE" }
-
-                val gamesTotal = games.sumOf { it.estimatedValue }
-                val consolesTotal = consoles.sumOf { it.estimatedValue }
-                val videoGamesTotal = gamesTotal + consolesTotal
-
-                val tcgTotal = tcgCards.sumOf { it.estimatedValue }
-                val mtgCards = tcgCards.filter { it.tcgGame == "MTG" }
-                val pokemonCards = tcgCards.filter { it.tcgGame == "POKEMON" }
-                val yugiohCards = tcgCards.filter { it.tcgGame == "YUGIOH" }
-
-                val collectiblesTotal = collectibles.sumOf { it.estimatedValue }
-                val grandTotal = videoGamesTotal + tcgTotal + collectiblesTotal
-
-                binding.grandTotalValue.text = "$${String.format("%.2f", grandTotal)}"
-                binding.totalItemCount.text = "${allItems.size} items in collection"
-
-                // Video Games row — combines games + consoles
-                binding.gamesCategoryValue.text = "$${String.format("%.2f", videoGamesTotal)}"
-                binding.gamesCategoryCount.text = "${games.size} games · ${consoles.size} consoles"
-
-                // TCG section — only shown when cards exist
-                if (tcgCards.isNotEmpty()) {
-                    binding.tcgCardSection.visibility = View.VISIBLE
-                    binding.tcgCategoryValue.text = "$${String.format("%.2f", tcgTotal)}"
-                    binding.tcgCategoryCount.text = "${tcgCards.size} cards"
-
-                    if (mtgCards.isNotEmpty()) {
-                        binding.tcgMtgRow.visibility = View.VISIBLE
-                        binding.tcgMtgValue.text = "$${String.format("%.2f", mtgCards.sumOf { it.estimatedValue })}"
-                    }
-                    if (pokemonCards.isNotEmpty()) {
-                        binding.tcgPokemonRow.visibility = View.VISIBLE
-                        binding.tcgPokemonValue.text = "$${String.format("%.2f", pokemonCards.sumOf { it.estimatedValue })}"
-                    }
-                    if (yugiohCards.isNotEmpty()) {
-                        binding.tcgYugiohRow.visibility = View.VISIBLE
-                        binding.tcgYugiohValue.text = "$${String.format("%.2f", yugiohCards.sumOf { it.estimatedValue })}"
-                    }
-                } else {
-                    binding.tcgCardSection.visibility = View.GONE
+                fetchAndDisplayDashboard(publicCode)
+            } catch (firstException: Exception) {
+                // Render free tier cold-starts after inactivity — wait and retry once
+                delay(5000)
+                if (!isResumed) return@launch
+                try {
+                    fetchAndDisplayDashboard(publicCode)
+                } catch (retryException: Exception) {
+                    binding.grandTotalValue.text = "--"
+                    binding.totalItemCount.text = "Could not load — check your connection"
+                    binding.gamesCategoryValue.text = "--"
                 }
-
-                // Collectibles section — only shown when collectibles exist
-                if (collectibles.isNotEmpty()) {
-                    binding.collectiblesCardSection.visibility = View.VISIBLE
-                    binding.collectiblesCategoryValue.text = "$${String.format("%.2f", collectiblesTotal)}"
-                    binding.collectiblesCategoryCount.text = "${collectibles.size} items"
-                } else {
-                    binding.collectiblesCardSection.visibility = View.GONE
-                }
-
-                binding.wishlistCount.text = "${wishlistItems.size} items on wishlist"
-
-                val recentItems = allItems.sortedByDescending { it.createdAt }.take(5)
-                binding.recentGamesText.text = if (recentItems.isEmpty()) {
-                    "No items added yet"
-                } else {
-                    recentItems.joinToString("\n") { item ->
-                        "${item.title} (${item.platform}) — $${String.format("%.2f", item.estimatedValue)}"
-                    }
-                }
-
-                buildCompletionTracker(games, catalogPlatformCounts)
-
-            } catch (exception: Exception) {
-                binding.grandTotalValue.text = "--"
-                binding.totalItemCount.text = "Could not load — check your connection"
-                binding.gamesCategoryValue.text = "--"
             } finally {
                 binding.loadingIndicator.visibility = View.GONE
             }
         }
     }
 
-    // Builds the per-platform "X / Y (Z%)" completion list using only platforms where the
-    // user owns at least 1 game, sorted by percent completion descending
-    private fun buildCompletionTracker(
-        ownedGames: List<com.lasallecollegevancouver.gameinventoryapp.network.CollectionItem>,
-        catalogCounts: List<PlatformCount>
-    ) {
-        val ownedByPlatform = ownedGames.groupingBy { it.platform }.eachCount()
+    private suspend fun fetchAndDisplayDashboard(publicCode: String) {
+        val allItems = repository.getItems(publicCode)
+        val wishlistItems = repository.getWishlist(publicCode)
 
-        val rows = catalogCounts
-            .filter { ownedByPlatform.containsKey(it.platform) }
-            .map { platformCount ->
-                PlatformCompletionRow(
-                    platform = platformCount.platform,
-                    owned = ownedByPlatform[platformCount.platform] ?: 0,
-                    total = platformCount.count
-                )
-            }
-            .sortedByDescending { row ->
-                if (row.total > 0) row.owned.toFloat() / row.total else 0f
-            }
+        val games = allItems.filter { it.type == "GAME" }
+        val consoles = allItems.filter { it.type == "CONSOLE" }
+        val tcgCards = allItems.filter { it.type == "TCG" }
+        val collectibles = allItems.filter { it.type == "COLLECTIBLE" }
 
-        if (rows.isEmpty()) {
-            binding.completionEmptyText.visibility = View.VISIBLE
-            binding.platformCompletionList.visibility = View.GONE
+        val gamesTotal = games.sumOf { it.estimatedValue }
+        val consolesTotal = consoles.sumOf { it.estimatedValue }
+        val videoGamesTotal = gamesTotal + consolesTotal
+
+        val tcgTotal = tcgCards.sumOf { it.estimatedValue }
+        val mtgCards = tcgCards.filter { it.tcgGame == "MTG" }
+        val pokemonCards = tcgCards.filter { it.tcgGame == "POKEMON" }
+        val yugiohCards = tcgCards.filter { it.tcgGame == "YUGIOH" }
+
+        val collectiblesTotal = collectibles.sumOf { it.estimatedValue }
+        val grandTotal = videoGamesTotal + tcgTotal + collectiblesTotal
+
+        binding.grandTotalValue.text = "$${String.format("%.2f", grandTotal)}"
+        binding.totalItemCount.text = "${allItems.size} items in collection"
+
+        // Video Games row — combines games + consoles
+        binding.gamesCategoryValue.text = "$${String.format("%.2f", videoGamesTotal)}"
+        binding.gamesCategoryCount.text = "${games.size} games · ${consoles.size} consoles"
+
+        // TCG section — only shown when cards exist
+        if (tcgCards.isNotEmpty()) {
+            binding.tcgCardSection.visibility = View.VISIBLE
+            binding.tcgCategoryValue.text = "$${String.format("%.2f", tcgTotal)}"
+            binding.tcgCategoryCount.text = "${tcgCards.size} cards"
+
+            if (mtgCards.isNotEmpty()) {
+                binding.tcgMtgRow.visibility = View.VISIBLE
+                binding.tcgMtgValue.text = "$${String.format("%.2f", mtgCards.sumOf { it.estimatedValue })}"
+            }
+            if (pokemonCards.isNotEmpty()) {
+                binding.tcgPokemonRow.visibility = View.VISIBLE
+                binding.tcgPokemonValue.text = "$${String.format("%.2f", pokemonCards.sumOf { it.estimatedValue })}"
+            }
+            if (yugiohCards.isNotEmpty()) {
+                binding.tcgYugiohRow.visibility = View.VISIBLE
+                binding.tcgYugiohValue.text = "$${String.format("%.2f", yugiohCards.sumOf { it.estimatedValue })}"
+            }
         } else {
-            binding.completionEmptyText.visibility = View.GONE
-            binding.platformCompletionList.visibility = View.VISIBLE
-            binding.platformCompletionList.adapter = PlatformCompletionAdapter(rows)
+            binding.tcgCardSection.visibility = View.GONE
+        }
+
+        // Collectibles section — only shown when collectibles exist
+        if (collectibles.isNotEmpty()) {
+            binding.collectiblesCardSection.visibility = View.VISIBLE
+            binding.collectiblesCategoryValue.text = "$${String.format("%.2f", collectiblesTotal)}"
+            binding.collectiblesCategoryCount.text = "${collectibles.size} items"
+        } else {
+            binding.collectiblesCardSection.visibility = View.GONE
+        }
+
+        binding.wishlistCount.text = "${wishlistItems.size} items on wishlist"
+
+        val topFiveItems = allItems.sortedByDescending { it.estimatedValue }.take(5)
+        binding.topValuableText.text = if (topFiveItems.isEmpty()) {
+            "No items in your collection yet"
+        } else {
+            topFiveItems.mapIndexed { index, item ->
+                "${index + 1}. ${item.title} (${item.platform}) — $${String.format("%.2f", item.estimatedValue)}"
+            }.joinToString("\n")
+        }
+
+        val recentItems = allItems.sortedByDescending { it.createdAt }.take(5)
+        binding.recentGamesText.text = if (recentItems.isEmpty()) {
+            "No items added yet"
+        } else {
+            recentItems.joinToString("\n") { item ->
+                "${item.title} (${item.platform}) — $${String.format("%.2f", item.estimatedValue)}"
+            }
         }
     }
 

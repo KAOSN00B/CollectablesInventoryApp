@@ -85,7 +85,7 @@ class GamesListFragment : Fragment() {
     private fun loadGames() {
         val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
         binding.loadingIndicator.visibility = View.VISIBLE
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 // Fetch all items and keep only games
                 fullGameList = repository.getItems(publicCode).filter { it.type == "GAME" }

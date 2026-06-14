@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Card image + info row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:id="@+id/card_image"
+                android:layout_width="100dp"
+                android:layout_height="140dp"
+                android:scaleType="fitCenter"
+                android:contentDescription="Card image" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"
+                android:orientation="vertical"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/card_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceTitleMedium"
+                    android:textColor="?attr/colorOnSurface"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/card_set_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/card_rarity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/card_prices"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodyMedium"
+                    android:textColor="@color/vault_secondary" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Condition chips: NM / LP / MP / HP / DMG -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Condition"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="6dp" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/condition_chip_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_nm"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NM"
+                android:checked="true" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_lp"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="LP" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mp"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="MP" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_hp"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HP" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_dmg"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DMG" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Foil toggle — hidden when card has no foil price -->
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/foil_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="✦  Foil / Holo copy"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
+
+        <!-- Quantity stepper -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quantity"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginBottom="6dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/quantity_decrease"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="−"
+                android:padding="0dp" />
+
+            <TextView
+                android:id="@+id/quantity_display"
+                android:layout_width="48dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="1"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textColor="?attr/colorOnSurface" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/quantity_increase"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:text="+"
+                android:padding="0dp" />
+
+        </LinearLayout>
+
+        <!-- Purchase price -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Purchase Price (optional)"
+            app:prefixText="$"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/purchase_price_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Notes -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Notes (optional)"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/notes_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:lines="2" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- For Trade toggle -->
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/for_trade_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Available for Trade"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Binder picker — tap to assign this card to a binder -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/binder_picker_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:clickable="true"
+            android:focusable="true"
+            style="?attr/materialCardViewFilledStyle">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="14dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Add to Binder"
+                    android:textAppearance="?attr/textAppearanceTitleSmall"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <TextView
+                    android:id="@+id/binder_picker_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="None"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Add to Collection button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/add_to_collection_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add to Collection" />
+
+    </LinearLayout>
+</ScrollView>

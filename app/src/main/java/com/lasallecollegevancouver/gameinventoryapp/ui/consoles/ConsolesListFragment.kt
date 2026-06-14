@@ -53,7 +53,7 @@ class ConsolesListFragment : Fragment() {
     private fun loadConsoles() {
         val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
         binding.loadingIndicator.visibility = View.VISIBLE
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val consoles = repository.getItems(publicCode).filter { it.type == "CONSOLE" }
                 consoleAdapter.submitList(consoles)

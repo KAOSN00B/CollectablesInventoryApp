@@ -11,7 +11,8 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/vault_surface">
+        android:background="@color/vault_surface"
+        android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -37,6 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/vault_surface"
+        android:fitsSystemWindows="true"
         app:itemIconTint="@color/bottom_nav_tint"
         app:itemTextColor="@color/bottom_nav_tint"
         app:itemActiveIndicatorStyle="@style/Widget.Material3.BottomNavigationView.ActiveIndicator"

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Which card game?"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textColor="?attr/colorOnSurface"
+        android:layout_marginBottom="20dp" />
+
+    <!-- All Games -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/option_all_games"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        app:cardCornerRadius="8dp"
+        app:cardBackgroundColor="@color/vault_surface_high"
+        app:strokeColor="@color/vault_outline"
+        app:strokeWidth="1dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="All Card Games" android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textColor="?attr/colorOnSurface" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Search MTG, Pokémon, and Yu-Gi-Oh! at once"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant" android:layout_marginTop="2dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Magic: The Gathering -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/option_mtg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        app:cardCornerRadius="8dp"
+        app:cardBackgroundColor="@color/vault_surface_high"
+        app:strokeColor="@color/vault_outline"
+        app:strokeWidth="1dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Magic: The Gathering" android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textColor="?attr/colorOnSurface" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Powered by Scryfall — every card, every printing"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant" android:layout_marginTop="2dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Pokémon TCG -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/option_pokemon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        app:cardCornerRadius="8dp"
+        app:cardBackgroundColor="@color/vault_surface_high"
+        app:strokeColor="@color/vault_outline"
+        app:strokeWidth="1dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Pokémon TCG" android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textColor="?attr/colorOnSurface" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Search all sets including Base Set, Scarlet &amp; Violet, and more"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant" android:layout_marginTop="2dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Yu-Gi-Oh! -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/option_yugioh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="8dp"
+        app:cardBackgroundColor="@color/vault_surface_high"
+        app:strokeColor="@color/vault_outline"
+        app:strokeWidth="1dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Yu-Gi-Oh!" android:textAppearance="?attr/textAppearanceTitleSmall"
+                android:textColor="?attr/colorOnSurface" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:text="Search every printing across all sets"
+                android:textAppearance="?attr/textAppearanceBodySmall"
+                android:textColor="?attr/colorOnSurfaceVariant" android:layout_marginTop="2dp" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

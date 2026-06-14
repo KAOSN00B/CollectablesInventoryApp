@@ -147,6 +147,7 @@
         <action android:id="@+id/action_aiIdentify_to_addEditGame" app:destination="@id/addEditGameFragment" />
         <action android:id="@+id/action_aiIdentify_to_addEditConsole" app:destination="@id/addEditConsoleFragment" />
         <action android:id="@+id/action_aiIdentify_to_addEditCollectible" app:destination="@id/addEditCollectibleFragment" />
+        <action android:id="@+id/action_aiIdentify_to_tcgCardDetail" app:destination="@id/tcgCardDetailBottomSheet" />
     </fragment>
 
     <fragment
@@ -203,6 +204,20 @@
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.lasallecollegevancouver.gameinventoryapp.ui.settings.SettingsFragment"
-        android:label="Settings" />
+        android:label="Settings">
+        <action
+            android:id="@+id/action_settings_to_friendCollection"
+            app:destination="@id/friendCollectionFragment" />
+    </fragment>
+
+    <!-- Read-only view of a friend's collection — never overwrites the user's own code -->
+    <fragment
+        android:id="@+id/friendCollectionFragment"
+        android:name="com.lasallecollegevancouver.gameinventoryapp.ui.friends.FriendCollectionFragment"
+        android:label="Friend's Collection">
+        <argument
+            android:name="friendCode"
+            app:argType="string" />
+    </fragment>
 
 </navigation>

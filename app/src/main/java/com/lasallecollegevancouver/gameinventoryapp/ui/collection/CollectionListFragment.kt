@@ -95,7 +95,7 @@ class CollectionListFragment : Fragment() {
     private fun loadItems() {
         val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
         binding.loadingIndicator.visibility = View.VISIBLE
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
                 val freshItems = repository.getItems(publicCode)
                 allItems = freshItems

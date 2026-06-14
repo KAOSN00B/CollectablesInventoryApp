@@ -6,73 +6,212 @@
     android:orientation="vertical"
     android:background="@color/vault_background">
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/search_input_layout"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+    <!-- Teal hero header with search bar -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingHorizontal="12dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="4dp"
-        app:endIconMode="clear_text"
-        app:startIconDrawable="@android:drawable/ic_menu_search"
-        android:hint="Search wishlist…">
+        android:orientation="vertical"
+        android:background="@color/vault_primary"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/search_input"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:maxLines="1" />
+            android:text="WISHLIST"
+            android:textColor="@color/vault_on_primary"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            android:letterSpacing="0.12"
+            android:layout_marginBottom="4dp" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Find games &amp; cards to track"
+            android:textColor="@color/vault_on_primary"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:layout_marginBottom="16dp" />
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search to add…"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            app:boxBackgroundColor="#33002021"
+            app:boxStrokeColor="@color/vault_on_primary"
+            app:hintTextColor="@color/vault_on_primary"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/vault_on_primary">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/search_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/vault_on_primary"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:maxLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <!-- Mode + filter controls -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/vault_surface"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="12dp">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/mode_chip_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            app:singleSelection="true"
+            app:selectionRequired="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mode_games"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Games"
+                android:checked="true" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_mode_tcg"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trading Cards" />
+
+        </com.google.android.material.chip.ChipGroup>
+
+        <!-- Games mode: platform picker -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/platform_filter_button"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:gravity="start|center_vertical"
+            android:paddingStart="16dp"
+            android:text="Any Platform" />
+
+        <!-- TCG mode: game filter chips (hidden until Trading Cards selected) -->
+        <HorizontalScrollView
+            android:id="@+id/tcg_game_filter_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/tcg_game_chips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tcg_all"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="All Cards"
+                    android:checked="true" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tcg_mtg"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MTG" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tcg_pokemon"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pokémon" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_tcg_yugioh"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Yu-Gi-Oh!" />
+
+            </com.google.android.material.chip.ChipGroup>
+
+        </HorizontalScrollView>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/search_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Search" />
+
+    </LinearLayout>
+
+    <!-- Status row: loading spinner + label/count -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="4dp">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/loading_indicator"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginEnd="8dp"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorSize="20dp"
+            app:indicatorColor="@color/vault_primary" />
+
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textAppearance="?attr/textAppearanceLabelMedium"
+            android:textColor="@color/vault_text_muted"
+            android:letterSpacing="0.08" />
+
+    </LinearLayout>
+
+    <!-- Unified list: shows wishlist items when idle, search results when searching -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <!-- Shown while data is loading -->
-        <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/loading_indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/empty_state_text"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/results_recycler"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Your wishlist is empty — tap + to add an item"
-            android:textAppearance="?attr/textAppearanceBodyLarge"
-            android:gravity="center"
-            android:layout_margin="32dp"
-            android:visibility="gone" />
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="80dp" />
 
-        <!-- Pull-to-refresh wrapping the wishlist -->
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipe_refresh"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/wishlist_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingBottom="80dp" />
-
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
+        <!-- Manual add FAB — fallback when an item isn't in the catalog -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab_add_wishlist_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:contentDescription="Add wishlist item"
+            android:contentDescription="Add manually"
             android:src="@android:drawable/ic_input_add" />
 
     </FrameLayout>

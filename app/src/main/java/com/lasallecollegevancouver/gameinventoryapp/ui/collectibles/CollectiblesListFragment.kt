@@ -80,7 +80,7 @@ class CollectiblesListFragment : Fragment() {
 
     // Loads all collectibles from Room then applies the current chip filter
     private fun loadCollectibles() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             fullCollectibleList = database.collectibleDao().getAllCollectibles()
             applyFilter()
         }
