@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "_Summer",
@@ -1231,7 +1231,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2008,
     "searchableText": "Alone in the Dark PS2 Horror"
   },
@@ -1243,7 +1243,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2001,
     "searchableText": "Alone in the Dark: The New Nightmare PS2 Horror"
   },
@@ -2491,7 +2491,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2002,
     "searchableText": "Clock Tower 3 PS2 Horror"
   },
@@ -4147,7 +4147,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2005,
     "searchableText": "Haunting Ground PS2 Horror"
   },
@@ -4951,7 +4951,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2004,
     "searchableText": "Kuon PS2 Horror"
   },
@@ -4963,7 +4963,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2002,
     "searchableText": "Kuon no Kizuna: Sairinsho PS2 Horror"
   },
@@ -6487,7 +6487,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2005,
     "searchableText": "Resident Evil 4 PS2 Horror"
   },
@@ -6499,7 +6499,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2001,
     "searchableText": "Resident Evil Code: Veronica X PS2 Horror"
   },
@@ -6511,7 +6511,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2003,
     "searchableText": "Resident Evil Outbreak PS2 Horror"
   },
@@ -6523,7 +6523,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2004,
     "searchableText": "Resident Evil Outbreak File #2 PS2 Horror"
   },
@@ -6535,7 +6535,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2001,
     "searchableText": "Resident Evil Survivor 2 Code: Veronica PS2 Horror"
   },
@@ -6547,7 +6547,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2003,
     "searchableText": "Resident Evil: Dead Aim PS2 Horror"
   },
@@ -6559,7 +6559,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2007,
     "searchableText": "Resident Evil: The Essentials PS2 Horror"
   },
@@ -6715,7 +6715,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2006,
     "searchableText": "Rule of Rose PS2 Horror"
   },
@@ -7315,7 +7315,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2001,
     "searchableText": "Silent Hill 2 PS2 Horror"
   },
@@ -7327,7 +7327,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2003,
     "searchableText": "Silent Hill 3 PS2 Horror"
   },
@@ -7339,7 +7339,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2004,
     "searchableText": "Silent Hill 4: The Room PS2 Horror"
   },
@@ -7351,7 +7351,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2006,
     "searchableText": "Silent Hill Complete Set PS2 Horror"
   },
@@ -7363,7 +7363,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2008,
     "searchableText": "Silent Hill: Origins PS2 Horror"
   },
@@ -7375,7 +7375,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2010,
     "searchableText": "Silent Hill: Shattered Memories PS2 Horror"
   },
@@ -8455,7 +8455,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2006,
     "searchableText": "The Silent Hill Collection PS2 Horror"
   },

@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "007: Everything or Nothing",
@@ -8383,7 +8383,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2001,
     "searchableText": "Play Novel Silent Hill GBA Horror"
   },

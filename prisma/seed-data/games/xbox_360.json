@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "'Splosion Man",
@@ -451,7 +451,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2010,
     "searchableText": "Alan Wake Xbox 360 Horror"
   },
@@ -463,7 +463,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2012,
     "searchableText": "Alan Wake's American Nightmare Xbox 360 Horror"
   },
@@ -631,7 +631,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2008,
     "searchableText": "Alone in the Dark Xbox 360 Horror"
   },
@@ -4963,7 +4963,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2008,
     "searchableText": "Dead Space Xbox 360 Horror"
   },
@@ -4975,7 +4975,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2011,
     "searchableText": "Dead Space 2 Xbox 360 Horror"
   },
@@ -4987,7 +4987,7 @@
     "looseValue": 10,
     "cibValue": 20,
     "newValue": 35,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2013,
     "searchableText": "Dead Space 3 Xbox 360 Horror"
   },
@@ -4999,7 +4999,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2010,
     "searchableText": "Dead Space Ignition Xbox 360 Horror"
   },
@@ -8047,7 +8047,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2011,
     "searchableText": "Resident Evil – Code: Veronica X Xbox 360 Horror"
   },
@@ -8059,7 +8059,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2012,
     "searchableText": "Resident Evil 4 Xbox 360 Horror"
   },
@@ -8071,7 +8071,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2009,
     "searchableText": "Resident Evil 5 Xbox 360 Horror"
   },
@@ -8083,7 +8083,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2012,
     "searchableText": "Resident Evil 6 Xbox 360 Horror"
   },
@@ -8095,7 +8095,7 @@
     "looseValue": 15,
     "cibValue": 30,
     "newValue": 52.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2014,
     "searchableText": "Resident Evil HD Remaster Xbox 360 Horror"
   },
@@ -8107,7 +8107,7 @@
     "looseValue": 15,
     "cibValue": 30,
     "newValue": 52.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2016,
     "searchableText": "Resident Evil Zero HD Remaster Xbox 360 Horror"
   },
@@ -8119,7 +8119,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2012,
     "searchableText": "Resident Evil: Operation Raccoon City Xbox 360 Horror"
   },
@@ -8131,7 +8131,7 @@
     "looseValue": 15,
     "cibValue": 30,
     "newValue": 52.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2013,
     "searchableText": "Resident Evil: Revelations Xbox 360 Horror"
   },
@@ -8143,7 +8143,7 @@
     "looseValue": 15,
     "cibValue": 30,
     "newValue": 52.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2013,
     "searchableText": "Resident Evil: Revelations 2 Xbox 360 Horror"
   },
@@ -8467,7 +8467,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2012,
     "searchableText": "Silent Hill HD Collection Xbox 360 Horror"
   },
@@ -8479,7 +8479,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2012,
     "searchableText": "Silent Hill: Downpour Xbox 360 Horror"
   },
@@ -8491,7 +8491,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2008,
     "searchableText": "Silent Hill: Homecoming Xbox 360 Horror"
   },

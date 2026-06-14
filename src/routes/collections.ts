@@ -60,6 +60,25 @@ const updateItemSchema = z.object({
   quantity: z.number().int().min(1).optional().nullable(),
 });
 
+const addWishlistSchema = z.object({
+  catalogItemId: z.number().int().positive().optional().nullable(),
+  title: z.string().min(1, "Title is required"),
+  platform: z.string().min(1, "Platform is required"),
+  targetPrice: z.number().min(0).optional(),
+  currentEstimatedValue: z.number().min(0).optional(),
+  notes: z.string().optional().nullable(),
+  isGrail: z.boolean().optional(),
+});
+
+const updateWishlistSchema = z.object({
+  title: z.string().min(1).optional(),
+  platform: z.string().min(1).optional(),
+  targetPrice: z.number().min(0).optional(),
+  currentEstimatedValue: z.number().min(0).optional(),
+  notes: z.string().optional().nullable(),
+  isGrail: z.boolean().optional(),
+});
+
 const router = Router();
 
 // Generate a random 5-character alphanumeric public code (e.g. "X7K2P")
@@ -331,23 +350,12 @@ router.post("/:code/wishlist", async (req: Request, res: Response, next: NextFun
       return;
     }
 
-    const {
-      catalogItemId,
-      title,
-      platform,
-      targetPrice,
-      currentEstimatedValue,
-      notes,
-      isGrail,
-    } = req.body as {
-      catalogItemId?: number;
-      title: string;
-      platform: string;
-      targetPrice?: number;
-      currentEstimatedValue?: number;
-      notes?: string;
-      isGrail?: boolean;
-    };
+    const parsed = addWishlistSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.errors[0].message });
+      return;
+    }
+    const { catalogItemId, title, platform, targetPrice, currentEstimatedValue, notes, isGrail } = parsed.data;
 
     const wishlistItem = await prisma.wishlistItem.create({
       data: {
@@ -390,19 +398,20 @@ router.put("/:code/wishlist/:id", async (req: Request, res: Response, next: Next
       return;
     }
 
-    const { targetPrice, currentEstimatedValue, notes, isGrail } = req.body as {
-      targetPrice?: number;
-      currentEstimatedValue?: number;
-      notes?: string;
-      isGrail?: boolean;
-    };
+    const parsed = updateWishlistSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.errors[0].message });
+      return;
+    }
+    const { title, platform, targetPrice, currentEstimatedValue, notes, isGrail } = parsed.data;
 
     const updated = await prisma.wishlistItem.update({
       where: { id: itemId },
       data: {
+        ...(title !== undefined && { title }),
+        ...(platform !== undefined && { platform }),
         targetPrice: targetPrice ?? existing.targetPrice,
-        currentEstimatedValue:
-          currentEstimatedValue ?? existing.currentEstimatedValue,
+        currentEstimatedValue: currentEstimatedValue ?? existing.currentEstimatedValue,
         notes: notes !== undefined ? notes : existing.notes,
         isGrail: isGrail !== undefined ? isGrail : existing.isGrail,
       },

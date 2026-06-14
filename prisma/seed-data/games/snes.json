@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "16-Bit Xmas 2011",
@@ -2263,7 +2263,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 1995,
     "searchableText": "Clock Tower SNES Horror"
   },

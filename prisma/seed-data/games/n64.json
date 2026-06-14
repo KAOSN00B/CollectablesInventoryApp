@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "1080° Snowboarding",
@@ -2971,7 +2971,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 1999,
     "searchableText": "Resident Evil 2 N64 Horror"
   },

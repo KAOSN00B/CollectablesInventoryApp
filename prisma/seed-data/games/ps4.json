@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": ".hack//G.U. Last Recode",
@@ -1375,7 +1375,7 @@
     "looseValue": 15,
     "cibValue": 28,
     "newValue": 45,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2021,
     "searchableText": "Alan Wake Remastered PS4 Horror"
   },
@@ -6955,7 +6955,7 @@
     "looseValue": 10,
     "cibValue": 20,
     "newValue": 35,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2017,
     "searchableText": "Outlast 2 PS4 Horror"
   },
@@ -7603,7 +7603,7 @@
     "looseValue": 22.5,
     "cibValue": 42,
     "newValue": 67.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2019,
     "searchableText": "Resident Evil 2 PS4 Horror"
   },
@@ -7615,7 +7615,7 @@
     "looseValue": 22.5,
     "cibValue": 42,
     "newValue": 67.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2020,
     "searchableText": "Resident Evil 3 PS4 Horror"
   },
@@ -7627,7 +7627,7 @@
     "looseValue": 15,
     "cibValue": 30,
     "newValue": 52.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2016,
     "searchableText": "Resident Evil 4 PS4 Horror"
   },
@@ -7639,7 +7639,7 @@
     "looseValue": 37.5,
     "cibValue": 60,
     "newValue": 97.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2023,
     "searchableText": "Resident Evil 4 (remake) PS4 Horror"
   },
@@ -7651,7 +7651,7 @@
     "looseValue": 15,
     "cibValue": 30,
     "newValue": 52.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2016,
     "searchableText": "Resident Evil 5 PS4 Horror"
   },
@@ -7663,7 +7663,7 @@
     "looseValue": 15,
     "cibValue": 30,
     "newValue": 52.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2016,
     "searchableText": "Resident Evil 6 PS4 Horror"
   },
@@ -7675,7 +7675,7 @@
     "looseValue": 15,
     "cibValue": 30,
     "newValue": 52.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2017,
     "searchableText": "Resident Evil 7: Biohazard PS4 Horror"
   },
@@ -7687,7 +7687,7 @@
     "looseValue": 15,
     "cibValue": 30,
     "newValue": 52.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2015,
     "searchableText": "Resident Evil HD Remaster PS4 Horror"
   },
@@ -7699,7 +7699,7 @@
     "looseValue": 22.5,
     "cibValue": 42,
     "newValue": 67.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2021,
     "searchableText": "Resident Evil Village PS4 Horror"
   },
@@ -7711,7 +7711,7 @@
     "looseValue": 15,
     "cibValue": 30,
     "newValue": 52.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2015,
     "searchableText": "Resident Evil Zero HD Remaster PS4 Horror"
   },
@@ -7723,7 +7723,7 @@
     "looseValue": 15,
     "cibValue": 30,
     "newValue": 52.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2017,
     "searchableText": "Resident Evil: Revelations PS4 Horror"
   },
@@ -7735,7 +7735,7 @@
     "looseValue": 15,
     "cibValue": 30,
     "newValue": 52.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2015,
     "searchableText": "Resident Evil: Revelations 2 PS4 Horror"
   },
@@ -8779,7 +8779,7 @@
     "looseValue": 10,
     "cibValue": 20,
     "newValue": 35,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2017,
     "searchableText": "The Evil Within 2 PS4 Horror"
   },

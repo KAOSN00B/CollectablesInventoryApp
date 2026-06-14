@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "...Iru!",
@@ -1147,7 +1147,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 1996,
     "searchableText": "Alone in the Dark: One-Eyed Jack's Revenge PS1 Horror"
   },
@@ -1159,7 +1159,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2001,
     "searchableText": "Alone in the Dark: The New Nightmare PS1 Horror"
   },
@@ -3295,7 +3295,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2000,
     "searchableText": "Dino Crisis 2 PS1 Horror"
   },
@@ -5047,7 +5047,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 1998,
     "searchableText": "Kuon no Kizuna PS1 Horror"
   },
@@ -6943,7 +6943,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 1996,
     "searchableText": "Resident Evil PS1 Horror"
   },
@@ -6955,7 +6955,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 1998,
     "searchableText": "Resident Evil 2 PS1 Horror"
   },
@@ -6967,7 +6967,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 1999,
     "searchableText": "Resident Evil 3: Nemesis PS1 Horror"
   },
@@ -6979,7 +6979,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2000,
     "searchableText": "Resident Evil Survivor PS1 Horror"
   },
@@ -6991,7 +6991,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 1997,
     "searchableText": "Resident Evil: Director's Cut PS1 Horror"
   },
@@ -7543,7 +7543,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 1999,
     "searchableText": "Silent Hill PS1 Horror"
   },

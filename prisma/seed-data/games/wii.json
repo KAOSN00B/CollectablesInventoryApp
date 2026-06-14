@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "007: Quantum of Solace",
@@ -367,7 +367,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2008,
     "searchableText": "Alone in the Dark Wii Horror"
   },
@@ -3355,7 +3355,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2009,
     "searchableText": "Dead Space: Extraction Wii Horror"
   },
@@ -8599,7 +8599,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2007,
     "searchableText": "Resident Evil 4: Wii Edition Wii Horror"
   },
@@ -8611,7 +8611,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2008,
     "searchableText": "Resident Evil Archives: Resident Evil Wii Horror"
   },
@@ -8623,7 +8623,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2008,
     "searchableText": "Resident Evil Archives: Resident Evil Zero Wii Horror"
   },
@@ -8635,7 +8635,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2009,
     "searchableText": "Resident Evil: The Darkside Chronicles Wii Horror"
   },
@@ -8647,7 +8647,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2007,
     "searchableText": "Resident Evil: The Umbrella Chronicles Wii Horror"
   },
@@ -8815,7 +8815,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2009,
     "searchableText": "Silent Hill: Shattered Memories Wii Horror"
   },

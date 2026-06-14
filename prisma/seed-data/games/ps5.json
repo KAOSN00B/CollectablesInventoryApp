@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "#Xmas, Super Puzzles Dream",
@@ -415,7 +415,7 @@
     "looseValue": 25,
     "cibValue": 40,
     "newValue": 65,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2023,
     "searchableText": "Alan Wake 2 PS5 Horror"
   },
@@ -427,7 +427,7 @@
     "looseValue": 15,
     "cibValue": 28,
     "newValue": 45,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2021,
     "searchableText": "Alan Wake Remastered PS5 Horror"
   },
@@ -2851,7 +2851,7 @@
     "looseValue": 25,
     "cibValue": 40,
     "newValue": 65,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2023,
     "searchableText": "Dead Space PS5 Horror"
   },
@@ -4039,7 +4039,7 @@
     "looseValue": 15,
     "cibValue": 28,
     "newValue": 45,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2021,
     "searchableText": "Fatal Frame: Maiden of Black Water PS5 Horror"
   },
@@ -8539,7 +8539,7 @@
     "looseValue": 37.5,
     "cibValue": 60,
     "newValue": 97.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2022,
     "searchableText": "Resident Evil 2 PS5 Horror"
   },
@@ -8551,7 +8551,7 @@
     "looseValue": 37.5,
     "cibValue": 60,
     "newValue": 97.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2022,
     "searchableText": "Resident Evil 3 PS5 Horror"
   },
@@ -8563,7 +8563,7 @@
     "looseValue": 37.5,
     "cibValue": 60,
     "newValue": 97.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2023,
     "searchableText": "Resident Evil 4 PS5 Horror"
   },
@@ -8575,7 +8575,7 @@
     "looseValue": 37.5,
     "cibValue": 60,
     "newValue": 97.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2022,
     "searchableText": "Resident Evil 7: Biohazard PS5 Horror"
   },
@@ -8587,7 +8587,7 @@
     "looseValue": 37.5,
     "cibValue": 60,
     "newValue": 97.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2026,
     "searchableText": "Resident Evil Requiem PS5 Horror"
   },
@@ -8599,7 +8599,7 @@
     "looseValue": 22.5,
     "cibValue": 42,
     "newValue": 67.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2021,
     "searchableText": "Resident Evil Village PS5 Horror"
   },
@@ -9043,7 +9043,7 @@
     "looseValue": 37.5,
     "cibValue": 60,
     "newValue": 97.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2024,
     "searchableText": "Silent Hill 2 PS5 Horror"
   },
@@ -9055,7 +9055,7 @@
     "looseValue": 37.5,
     "cibValue": 60,
     "newValue": 97.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2025,
     "searchableText": "Silent Hill f PS5 Horror"
   },
@@ -9067,7 +9067,7 @@
     "looseValue": 37.5,
     "cibValue": 60,
     "newValue": 97.5,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2024,
     "searchableText": "Silent Hill: The Short Message PS5 Horror"
   },

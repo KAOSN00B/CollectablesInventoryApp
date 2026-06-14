@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "2Tax Gold",
@@ -199,7 +199,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 1996,
     "searchableText": "Alone in the Dark 2 Saturn Horror"
   },
@@ -8227,7 +8227,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 1997,
     "searchableText": "Resident Evil Saturn Horror"
   },

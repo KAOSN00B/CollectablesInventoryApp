@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "187 Ride or Die",
@@ -2263,7 +2263,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2003,
     "searchableText": "Dino Crisis 3 Xbox Horror"
   },
@@ -2779,7 +2779,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2002,
     "searchableText": "Fatal Frame Xbox Horror"
   },
@@ -2791,7 +2791,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2004,
     "searchableText": "Fatal Frame II: Crimson Butterfly Director's Cut Xbox Horror"
   },
@@ -7087,7 +7087,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2001,
     "searchableText": "Silent Hill 2 Xbox Horror"
   },
@@ -7099,7 +7099,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2004,
     "searchableText": "Silent Hill 4: The Room Xbox Horror"
   },

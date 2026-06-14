@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "102 Dalmatians: Puppies to the Rescue",
@@ -283,7 +283,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2001,
     "searchableText": "Alone in the Dark: The New Nightmare Dreamcast Horror"
   },
@@ -1543,7 +1543,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2000,
     "searchableText": "Dino Crisis Dreamcast Horror"
   },
@@ -3595,7 +3595,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2000,
     "searchableText": "Kuon no Kizuna: Sairinshou Dreamcast Horror"
   },
@@ -5671,7 +5671,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2000,
     "searchableText": "Resident Evil – Code: Veronica Dreamcast Horror"
   },
@@ -5683,7 +5683,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 1999,
     "searchableText": "Resident Evil 2 Dreamcast Horror"
   },
@@ -5695,7 +5695,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2000,
     "searchableText": "Resident Evil 3: Nemesis Dreamcast Horror"
   },

@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "10-in-1: Arcade Collection",
@@ -8539,7 +8539,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2012,
     "searchableText": "Resident Evil: Revelations 3DS Horror"
   },
@@ -8551,7 +8551,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2011,
     "searchableText": "Resident Evil: The Mercenaries 3D 3DS Horror"
   },

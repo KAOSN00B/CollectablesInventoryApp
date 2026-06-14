@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "102 Dalmatians: Puppies to the Rescue",
@@ -127,7 +127,7 @@
     "looseValue": 20,
     "cibValue": 40,
     "newValue": 80,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2001,
     "searchableText": "Alone in the Dark: The New Nightmare Game Boy Color Horror"
   },
@@ -7375,7 +7375,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2001,
     "searchableText": "Resident Evil Gaiden Game Boy Color Horror"
   },

@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "-8 (Minus 8)",
@@ -7399,7 +7399,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2011,
     "searchableText": "Kuon no Kizuna: Sairin Mikotonori Portable PSP Horror"
   },
@@ -8647,7 +8647,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2007,
     "searchableText": "Silent Hill: Origins PSP Horror"
   },
@@ -8659,7 +8659,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2010,
     "searchableText": "Silent Hill: Shattered Memories PSP Horror"
   },
@@ -9091,7 +9091,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2006,
     "searchableText": "The Silent Hill Experience PSP Horror"
   },

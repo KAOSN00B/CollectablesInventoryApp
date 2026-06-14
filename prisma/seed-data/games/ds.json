@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "007: Quantum of Solace",
@@ -7903,7 +7903,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2006,
     "searchableText": "Resident Evil: Deadly Silence DS Horror"
   },

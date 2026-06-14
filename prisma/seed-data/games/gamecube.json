@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "type": "GAME",
     "title": "1080° Avalanche",
@@ -4447,7 +4447,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2002,
     "searchableText": "Resident Evil GameCube Horror"
   },
@@ -4459,7 +4459,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2003,
     "searchableText": "Resident Evil – Code: Veronica X GameCube Horror"
   },
@@ -4471,7 +4471,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2003,
     "searchableText": "Resident Evil 2 GameCube Horror"
   },
@@ -4483,7 +4483,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2003,
     "searchableText": "Resident Evil 3: Nemesis GameCube Horror"
   },
@@ -4495,7 +4495,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2005,
     "searchableText": "Resident Evil 4 GameCube Horror"
   },
@@ -4507,7 +4507,7 @@
     "looseValue": 30,
     "cibValue": 60,
     "newValue": 120,
-    "genre": "Horror",
+    "genre": "Survival Horror",
     "releaseYear": 2002,
     "searchableText": "Resident Evil Zero GameCube Horror"
   },
