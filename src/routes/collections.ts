@@ -352,7 +352,7 @@ router.post("/:code/wishlist", async (req: Request, res: Response, next: NextFun
 
     const parsed = addWishlistSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ error: parsed.error.errors[0].message });
+      res.status(400).json({ error: parsed.error.issues[0].message });
       return;
     }
     const { catalogItemId, title, platform, targetPrice, currentEstimatedValue, notes, isGrail } = parsed.data;
@@ -400,7 +400,7 @@ router.put("/:code/wishlist/:id", async (req: Request, res: Response, next: Next
 
     const parsed = updateWishlistSchema.safeParse(req.body);
     if (!parsed.success) {
-      res.status(400).json({ error: parsed.error.errors[0].message });
+      res.status(400).json({ error: parsed.error.issues[0].message });
       return;
     }
     const { title, platform, targetPrice, currentEstimatedValue, notes, isGrail } = parsed.data;
