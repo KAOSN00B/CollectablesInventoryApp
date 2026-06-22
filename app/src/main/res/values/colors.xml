@@ -12,6 +12,15 @@
     <color name="vault_outline">#36434A</color>
     <color name="vault_positive">#62D26F</color>
     <color name="vault_negative">#FF6B6B</color>
+
+    <!-- Display-case specific tokens (added for the "Premium Digital Display Case" UI) -->
+    <!-- vault_recessed: the very dark color behind a card image so the artwork looks "sunk in" -->
+    <color name="vault_recessed">#0B0E11</color>
+    <!-- Shimmer skeleton colors: base is the resting gray block, highlight is the lighter sweep -->
+    <color name="vault_shimmer_base">#1E262C</color>
+    <color name="vault_shimmer_highlight">#2C363D</color>
+    <!-- Thin semi-transparent white border used for the "slab" / plastic-case effect -->
+    <color name="vault_slab_border">#1AFFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

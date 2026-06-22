@@ -79,14 +79,6 @@
                 android:text="Scan" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button_search"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:text="Search" />
-
-            <com.google.android.material.button.MaterialButton
                 android:id="@+id/button_add"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

@@ -18,6 +18,7 @@ import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentCollecti
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectionItem
 import com.lasallecollegevancouver.gameinventoryapp.ui.smart_add.SmartAddBottomSheet
+import com.lasallecollegevancouver.gameinventoryapp.ui.tcg.OwnedTcgDetailBottomSheet
 import kotlinx.coroutines.launch
 
 // Sort options available from the sort picker dialog
@@ -52,11 +53,18 @@ class CollectionListFragment : Fragment() {
             when (selectedItem.type) {
                 "GAME"    -> findNavController().navigate(R.id.action_collectionList_to_gameDetail, bundle)
                 "CONSOLE" -> findNavController().navigate(R.id.action_collectionList_to_consoleDetail, bundle)
+                "TCG"     -> OwnedTcgDetailBottomSheet.newInstance(selectedItem.id)
+                    .show(parentFragmentManager, "OwnedTcgDetail")
                 else -> Toast.makeText(requireContext(), "${selectedItem.type} detail view is coming next", Toast.LENGTH_SHORT).show()
             }
         }
         binding.collectionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.collectionRecyclerView.adapter = collectionAdapter
+
+        // Refresh the list when a TCG card is removed from its detail sheet.
+        parentFragmentManager.setFragmentResultListener(
+            OwnedTcgDetailBottomSheet.RESULT_KEY_CHANGED, viewLifecycleOwner
+        ) { _, _ -> loadItems() }
 
         // Comics, Toys, LEGO not implemented yet — hide those chips
         binding.chipComics.visibility = View.GONE

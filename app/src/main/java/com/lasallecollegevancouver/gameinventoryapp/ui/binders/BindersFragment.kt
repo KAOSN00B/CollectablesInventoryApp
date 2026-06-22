@@ -33,6 +33,11 @@ class BindersFragment : Fragment() {
 
         binding.bindersRecycler.layoutManager = LinearLayoutManager(requireContext())
 
+        // Pinned "All Items" card opens the full collection (including items not in any binder).
+        binding.allItemsCard.setOnClickListener {
+            findNavController().navigate(R.id.action_binders_to_collectionList)
+        }
+
         binding.bindersFab.setOnClickListener { showCreateBinderDialog() }
     }
 

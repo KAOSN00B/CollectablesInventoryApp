@@ -13,11 +13,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.google.gson.Gson
 import com.lasallecollegevancouver.gameinventoryapp.R
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentTcgSearchBinding
 import com.lasallecollegevancouver.gameinventoryapp.network.tcg.TcgSearchResult
+import com.lasallecollegevancouver.gameinventoryapp.ui.common.DisplayCaseCardAdapter
+import com.lasallecollegevancouver.gameinventoryapp.ui.common.DisplayCaseSkeletonAdapter
 import kotlinx.coroutines.launch
 
 class TcgSearchFragment : Fragment() {
@@ -26,7 +28,13 @@ class TcgSearchFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: TcgSearchViewModel by viewModels()
-    private lateinit var resultAdapter: TcgSearchResultAdapter
+    private lateinit var resultAdapter: DisplayCaseCardAdapter
+    private val skeletonAdapter = DisplayCaseSkeletonAdapter()
+
+    companion object {
+        // Two columns gives a roomy "binder page" grid where titles and prices stay legible.
+        private const val GRID_COLUMN_COUNT = 2
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentTcgSearchBinding.inflate(inflater, container, false)
@@ -52,11 +60,17 @@ class TcgSearchFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        resultAdapter = TcgSearchResultAdapter { card ->
+        // Results grid: real Display Case cards.
+        resultAdapter = DisplayCaseCardAdapter { card ->
             navigateToCardDetail(card)
         }
-        binding.resultsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.resultsRecyclerView.layoutManager = GridLayoutManager(requireContext(), GRID_COLUMN_COUNT)
         binding.resultsRecyclerView.adapter = resultAdapter
+
+        // Skeleton grid: shimmering placeholders shown while a search is in flight. It uses the
+        // same column count so the placeholders line up exactly with the real cards that replace them.
+        binding.skeletonRecyclerView.layoutManager = GridLayoutManager(requireContext(), GRID_COLUMN_COUNT)
+        binding.skeletonRecyclerView.adapter = skeletonAdapter
     }
 
     private fun setupSearchBar() {
@@ -99,29 +113,35 @@ class TcgSearchFragment : Fragment() {
                     when (state) {
                         is TcgSearchUiState.Idle -> {
                             binding.loadingIndicator.visibility = View.GONE
+                            binding.skeletonRecyclerView.visibility = View.GONE
                             binding.resultsRecyclerView.visibility = View.GONE
                             binding.statusText.visibility = View.VISIBLE
                             binding.statusText.text = "Search for a card name above"
                         }
                         is TcgSearchUiState.Loading -> {
-                            binding.loadingIndicator.visibility = View.VISIBLE
+                            // Premium loading: show the shimmering skeleton grid instead of a bare spinner.
+                            binding.loadingIndicator.visibility = View.GONE
+                            binding.skeletonRecyclerView.visibility = View.VISIBLE
                             binding.resultsRecyclerView.visibility = View.GONE
                             binding.statusText.visibility = View.GONE
                         }
                         is TcgSearchUiState.Success -> {
                             binding.loadingIndicator.visibility = View.GONE
+                            binding.skeletonRecyclerView.visibility = View.GONE
                             binding.statusText.visibility = View.GONE
                             binding.resultsRecyclerView.visibility = View.VISIBLE
                             resultAdapter.submitList(state.results)
                         }
                         is TcgSearchUiState.Empty -> {
                             binding.loadingIndicator.visibility = View.GONE
+                            binding.skeletonRecyclerView.visibility = View.GONE
                             binding.resultsRecyclerView.visibility = View.GONE
                             binding.statusText.visibility = View.VISIBLE
                             binding.statusText.text = "No cards found — try a different name"
                         }
                         is TcgSearchUiState.Error -> {
                             binding.loadingIndicator.visibility = View.GONE
+                            binding.skeletonRecyclerView.visibility = View.GONE
                             binding.resultsRecyclerView.visibility = View.GONE
                             binding.statusText.visibility = View.VISIBLE
                             binding.statusText.text = state.message

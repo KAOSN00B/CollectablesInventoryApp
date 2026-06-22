@@ -183,10 +183,14 @@
     <fragment
         android:id="@+id/bindersFragment"
         android:name="com.lasallecollegevancouver.gameinventoryapp.ui.binders.BindersFragment"
-        android:label="Binders">
+        android:label="Collection">
         <action
             android:id="@+id/action_binders_to_binderDetail"
             app:destination="@id/binderDetailFragment" />
+        <!-- "All Items" shortcut opens the full, unfiltered collection list -->
+        <action
+            android:id="@+id/action_binders_to_collectionList"
+            app:destination="@id/collectionListFragment" />
     </fragment>
 
     <!-- Binder detail screen — shows all items in one binder -->

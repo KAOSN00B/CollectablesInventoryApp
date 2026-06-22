@@ -14,12 +14,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.lasallecollegevancouver.gameinventoryapp.R
 import com.lasallecollegevancouver.gameinventoryapp.config.PrefsHelper
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentGamesListBinding
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectionItem
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
+import com.lasallecollegevancouver.gameinventoryapp.network.RetrofitClient
+import com.lasallecollegevancouver.gameinventoryapp.ui.common.DisplayCaseSkeletonAdapter
 import com.lasallecollegevancouver.gameinventoryapp.ui.smart_add.SmartAddBottomSheet
 import kotlinx.coroutines.launch
 
@@ -29,11 +31,18 @@ class GamesListFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val repository = CollectOsRepository()
-    private lateinit var gameAdapter: GameAdapter
+    private val rawgRepository = RetrofitClient.rawgRepository
+    private lateinit var gameAdapter: GameDisplayCaseAdapter
+    private val skeletonAdapter = DisplayCaseSkeletonAdapter()
 
     private var fullGameList: List<CollectionItem> = emptyList()
     private var currentSort = "Date Added"
     private var currentFilter = "All Platforms"
+
+    companion object {
+        // Two columns of box art reads as a tidy "shelf" while keeping titles legible.
+        private const val GRID_COLUMN_COUNT = 2
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentGamesListBinding.inflate(inflater, container, false)
@@ -74,17 +83,30 @@ class GamesListFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        gameAdapter = GameAdapter { selectedItem ->
+        // Real games grid: Display Case cards with RAWG box art resolved per item.
+        gameAdapter = GameDisplayCaseAdapter(
+            coverArtScope = viewLifecycleOwner.lifecycleScope,
+            rawgRepository = rawgRepository
+        ) { selectedItem ->
             val bundle = Bundle().apply { putInt("itemId", selectedItem.id) }
             findNavController().navigate(R.id.action_gamesList_to_gameDetail, bundle)
         }
-        binding.gamesRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.gamesRecyclerView.layoutManager = GridLayoutManager(requireContext(), GRID_COLUMN_COUNT)
         binding.gamesRecyclerView.adapter = gameAdapter
+
+        // Skeleton grid: shimmering placeholders shown over the list during the first load.
+        binding.skeletonRecyclerView.layoutManager = GridLayoutManager(requireContext(), GRID_COLUMN_COUNT)
+        binding.skeletonRecyclerView.adapter = skeletonAdapter
     }
 
     private fun loadGames() {
         val publicCode = PrefsHelper.getPublicCode(requireContext()) ?: return
-        binding.loadingIndicator.visibility = View.VISIBLE
+
+        // On the very first load (nothing on screen yet) show the shimmering skeleton grid.
+        // On later refreshes the list is already visible, so the swipe-refresh spinner is enough.
+        val isFirstLoad = gameAdapter.currentList.isEmpty()
+        binding.skeletonRecyclerView.visibility = if (isFirstLoad) View.VISIBLE else View.GONE
+
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 // Fetch all items and keep only games
@@ -94,7 +116,7 @@ class GamesListFragment : Fragment() {
                 binding.emptyStateText.text = "Could not load games — check your connection"
                 binding.emptyStateText.visibility = View.VISIBLE
             } finally {
-                binding.loadingIndicator.visibility = View.GONE
+                binding.skeletonRecyclerView.visibility = View.GONE
                 binding.swipeRefresh.isRefreshing = false
             }
         }

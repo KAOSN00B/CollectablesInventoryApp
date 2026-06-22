@@ -1,16 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Binders screen — now the main "Collection" tab.
+    A pinned "All Items" card sits at the top so the user can always reach their entire collection
+    (including items not yet sorted into a binder), followed by the scrollable list of binders.
+-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/vault_background">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/binders_recycler"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="12dp"
-        android:clipToPadding="false" />
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Pinned "All Items" shortcut to the full, unfiltered collection -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/all_items_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="@color/vault_surface_high"
+            app:strokeColor="@color/vault_primary"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@android:drawable/ic_menu_agenda"
+                    app:tint="@color/vault_primary"
+                    android:contentDescription="All items" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="All Items"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="@color/vault_text" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Everything in your collection"
+                        android:textAppearance="?attr/textAppearanceBodySmall"
+                        android:textColor="@color/vault_text_muted" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="›"
+                    android:textSize="24sp"
+                    android:textColor="@color/vault_text_muted" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- The user's binders -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/binders_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="80dp" />
+
+    </LinearLayout>
 
     <TextView
         android:id="@+id/binders_empty_text"
@@ -19,7 +95,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:padding="32dp"
-        android:text="No binders yet.\nCreate one when adding a card or game."
+        android:text="No binders yet.\nCreate one with the + button, or tap All Items above."
         android:textColor="@color/vault_text_muted"
         android:textAppearance="?attr/textAppearanceBodyMedium"
         android:visibility="gone" />

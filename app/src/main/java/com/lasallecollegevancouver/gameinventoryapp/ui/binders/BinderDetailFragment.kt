@@ -14,6 +14,7 @@ import com.lasallecollegevancouver.gameinventoryapp.config.PrefsHelper
 import com.lasallecollegevancouver.gameinventoryapp.databinding.FragmentBinderDetailBinding
 import com.lasallecollegevancouver.gameinventoryapp.network.CollectOsRepository
 import com.lasallecollegevancouver.gameinventoryapp.ui.collection.CollectionEntryAdapter
+import com.lasallecollegevancouver.gameinventoryapp.ui.tcg.OwnedTcgDetailBottomSheet
 import kotlinx.coroutines.launch
 
 class BinderDetailFragment : Fragment() {
@@ -41,6 +42,11 @@ class BinderDetailFragment : Fragment() {
         binding.binderDetailRecycler.layoutManager = LinearLayoutManager(requireContext())
 
         binding.deleteBinderButton.setOnClickListener { confirmDeleteBinder() }
+
+        // Refresh the binder contents when a TCG card is removed from its detail sheet.
+        parentFragmentManager.setFragmentResultListener(
+            OwnedTcgDetailBottomSheet.RESULT_KEY_CHANGED, viewLifecycleOwner
+        ) { _, _ -> loadBinderDetail() }
 
         loadBinderDetail()
     }
@@ -80,7 +86,9 @@ class BinderDetailFragment : Fragment() {
                         when (selectedItem.type) {
                             "GAME"    -> findNavController().navigate(R.id.action_global_gameDetail, bundle)
                             "CONSOLE" -> findNavController().navigate(R.id.action_global_consoleDetail, bundle)
-                            else      -> { /* detail screens for TCG/Collectible coming later */ }
+                            "TCG"     -> OwnedTcgDetailBottomSheet.newInstance(selectedItem.id)
+                                .show(parentFragmentManager, "OwnedTcgDetail")
+                            else      -> { /* collectible detail still coming later */ }
                         }
                     }
                     binding.binderDetailRecycler.adapter = adapter

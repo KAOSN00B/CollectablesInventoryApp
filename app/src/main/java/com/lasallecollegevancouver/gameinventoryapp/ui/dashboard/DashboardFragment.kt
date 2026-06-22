@@ -38,7 +38,6 @@ class DashboardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonScan.setOnClickListener { findNavController().navigate(R.id.action_global_barcodeScan) }
-        binding.buttonSearch.setOnClickListener { findNavController().navigate(R.id.action_global_search) }
         binding.buttonAdd.setOnClickListener {
             SmartAddBottomSheet.newInstance().show(parentFragmentManager, "SmartAdd")
         }
