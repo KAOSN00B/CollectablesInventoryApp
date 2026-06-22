@@ -5,6 +5,7 @@
 > Built for the Mobile Development course at LaSalle College Vancouver. Package: `com.lasallecollegevancouver.gameinventoryapp` (internally branded "CollectOS").
 
 ---
+<img width="704" height="1486" alt="Recording 2026-06-21 200409" src="https://github.com/user-attachments/assets/d3fcf7a2-45f6-4e08-85de-e07128357c07" />
 
 ## Features
 
@@ -38,6 +39,9 @@
 - **Prisma 7** ORM → **PostgreSQL**
 - `zod` validation, `helmet`, `cors`, `express-rate-limit`
 - Hosted on **Render** (web service) + **Neon** (Postgres) + **cron-job.org** (keep-alive ping)
+<img width="704" height="1486" alt="Recording 2026-06-21 200747" src="https://github.com/user-attachments/assets/83bffbb1-4e44-4e2c-8cf8-be84fbee782d" />
+<img width="704" height="1486" alt="Recording 2026-06-21 200409" src="https://github.com/user-attachments/assets/822c9ba9-b5c3-42d8-8a0c-e8999a3812c7" />
+
 
 ---
 
@@ -117,6 +121,8 @@ Set `DATABASE_URL` (a Neon Postgres connection string) in a `.env` file locally,
 
 **Deploy:** Render builds with `npm install && npx prisma generate && npm run build` and starts with `npm start`. A cron-job.org ping hits `GET /health` every 14 minutes to avoid free-tier cold starts.
 
+<img width="704" height="1486" alt="Recording 2026-06-21 200555" src="https://github.com/user-attachments/assets/9af2b49d-b21a-4fb3-b398-1bf681f28180" />
+
 ---
 
 ## Design
@@ -148,6 +154,8 @@ app/src/main/java/.../
     ├── wishlist/  dashboard/ settings/ onboarding/
     └── smart_add/ barcode scan, photo scan, catalog search, add sheets
 ```
+
+<img width="704" height="1486" alt="Recording 2026-06-21 200747" src="https://github.com/user-attachments/assets/ba29f806-f59e-44ad-86b6-552d9b5d9179" />
 
 ---
 
