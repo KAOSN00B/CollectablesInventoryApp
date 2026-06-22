@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Detail view for a TCG card the user already owns (guide section 2B: "Item Detail View").
+
+    Centre-stage is the card artwork, shown as a "slab": wrapped in a thin semi-transparent white
+    border to mimic a plastic protective case, and sitting on a soft cyan backlit glow so it looks
+    like it is lit on a display shelf. Below the slab are the card's name, set, rarity, a one-line
+    metadata summary (condition / quantity / foil / trade), its estimated value, and any notes,
+    followed by Delete and Close actions.
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/vault_surface">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="20dp">
+
+        <!-- Hero area: glow behind, slab (card-in-case) in front -->
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+
+            <!-- Backlit shelf glow, larger than the card so it spills out around the edges -->
+            <View
+                android:layout_width="280dp"
+                android:layout_height="380dp"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_tcg_hero_glow" />
+
+            <!-- The "slab": thin white border + rounded corners = plastic protective case look -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/slab_card"
+                android:layout_width="210dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                app:cardCornerRadius="14dp"
+                app:cardBackgroundColor="@color/vault_recessed"
+                app:strokeColor="@color/vault_slab_border"
+                app:strokeWidth="1dp"
+                app:cardElevation="8dp">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="6dp">
+
+                    <ImageView
+                        android:id="@+id/hero_image"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="Card artwork"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintDimensionRatio="H,2:3" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </FrameLayout>
+
+        <!-- Card name -->
+        <TextView
+            android:id="@+id/detail_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:textStyle="bold"
+            android:textColor="@color/vault_text"
+            tools:text="Charizard ex" />
+
+        <!-- Set name · card number -->
+        <TextView
+            android:id="@+id/detail_set"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="@color/vault_text_muted"
+            tools:text="Obsidian Flames · #125" />
+
+        <!-- Rarity -->
+        <TextView
+            android:id="@+id/detail_rarity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:gravity="center"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            android:textAllCaps="true"
+            android:textColor="@color/vault_primary"
+            tools:text="Double Rare" />
+
+        <!-- One-line metadata: condition / quantity / foil / trade -->
+        <TextView
+            android:id="@+id/detail_meta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="@color/vault_text"
+            tools:text="NM  ·  Qty 2  ·  Foil  ·  For Trade" />
+
+        <!-- Estimated value (big accent number) -->
+        <TextView
+            android:id="@+id/detail_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:textAppearance="?attr/textAppearanceHeadlineMedium"
+            android:textStyle="bold"
+            android:textColor="@color/vault_secondary"
+            tools:text="$184.00" />
+
+        <!-- Notes (hidden when empty) -->
+        <TextView
+            android:id="@+id/detail_notes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="@color/vault_text_muted"
+            android:visibility="gone"
+            tools:text="Notes: pulled from my first booster box"
+            tools:visibility="visible" />
+
+        <!-- Actions -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/delete_button"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Remove from collection"
+            app:strokeColor="@color/vault_negative"
+            android:textColor="@color/vault_negative" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/close_button"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Close" />
+
+    </LinearLayout>
+
+</ScrollView>

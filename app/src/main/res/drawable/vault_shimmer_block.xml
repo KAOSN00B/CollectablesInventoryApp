@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    A single rounded gray block used to build skeleton (loading placeholder) screens.
+    Several of these stacked together approximate the shape of a real card before its
+    data arrives from the API. ShimmerHelper animates the opacity of the whole skeleton
+    so these blocks gently "breathe", giving the premium loading feel the guide asks for.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="6dp" />
+    <solid android:color="@color/vault_shimmer_base" />
+</shape>

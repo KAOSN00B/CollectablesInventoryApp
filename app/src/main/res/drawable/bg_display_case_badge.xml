@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Rounded pill background for the floating badge in the top-right corner of a card
+    (e.g. a "PSA 10" grade slab badge, or a colored "MTG" / "PKM" / "YGO" game badge).
+
+    The fill color here is just a default white. At runtime DisplayCaseBinder mutates a
+    copy of this drawable and recolors it (red for PSA, blue for BGS, the game colors, etc.)
+    so a single drawable can serve every badge type without needing one XML file per color.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <corners android:radius="6dp" />
+    <solid android:color="@color/white" />
+</shape>

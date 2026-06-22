@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Backlit "shelf glow" behind the hero card image on the TCG detail view (guide section 2B).
+    A radial gradient that is strongest (cyan, semi-transparent) in the centre and fades to fully
+    transparent at the edges. Placed behind the card image, it reads as if the card is lit from
+    behind on a display shelf.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <gradient
+        android:type="radial"
+        android:gradientRadius="50%"
+        android:startColor="#6639D6D6"
+        android:centerColor="#2639D6D6"
+        android:endColor="#0039D6D6" />
+</shape>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Recessed image background for the Display Case card.
+    Goal: make the card/box artwork look like it is "sunk into" the surface,
+    as if it were sitting inside a physical display shelf.
+
+    How it works:
+      Layer 1 - a flat very-dark fill (vault_recessed) gives the empty/loading state a
+                deep base color that matches the "inside of a case" look.
+      Layer 2 - a subtle top-to-bottom dark gradient overlay. Because it darkens the
+                bottom edge slightly more than the top, the eye reads it as a soft
+                inner shadow, which is what sells the "recessed" feel.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Base fill -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="10dp" />
+            <solid android:color="@color/vault_recessed" />
+        </shape>
+    </item>
+
+    <!-- Inner-shadow simulation: transparent at top, slightly dark at bottom -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="10dp" />
+            <gradient
+                android:angle="270"
+                android:startColor="#00000000"
+                android:endColor="#3D000000" />
+        </shape>
+    </item>
+
+</layer-list>

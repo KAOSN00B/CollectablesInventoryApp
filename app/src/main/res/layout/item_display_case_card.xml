@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The reusable "Display Case" grid card (guide section 2A).
+
+    This is the single card component the guide asks for: it takes an image URL, a title,
+    a set/subtitle line, and a market price, and renders them as a premium "digital display
+    case" tile. It is intentionally generic so it can show a trading card, a game box, or any
+    other collectible — only the data bound into it changes.
+
+    Layout structure:
+      MaterialCardView (rounded, dark surface, subtle outline)
+        └─ vertical LinearLayout
+             ├─ image_container (ConstraintLayout, locks a 2:3 portrait ratio for cards)
+             │     ├─ item_image  (the API artwork, drawn over the recessed background)
+             │     └─ badge_label (floating top-right grade/category badge)
+             ├─ item_title
+             ├─ item_set
+             └─ item_price
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/card_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardCornerRadius="12dp"
+    app:cardBackgroundColor="@color/vault_surface"
+    app:strokeColor="@color/vault_outline"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!--
+            Image container. The ImageView is constrained to a 2:3 portrait ratio
+            (the standard trading-card shape) via layout_constraintDimensionRatio="H,2:3",
+            which means "compute Height from Width using a 2:3 width:height ratio".
+            The recessed background shows through while the image loads.
+        -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/image_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/vault_recessed_image"
+            android:padding="4dp">
+
+            <ImageView
+                android:id="@+id/item_image"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"
+                android:contentDescription="Collectible artwork"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintDimensionRatio="H,2:3" />
+
+            <!--
+                Floating badge, pinned to the top-right of the image (guide: "PSA 10").
+                Hidden by default; DisplayCaseBinder makes it visible and recolors it
+                only when there is something to show (a grade, or a game/category tag).
+            -->
+            <TextView
+                android:id="@+id/badge_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:background="@drawable/bg_display_case_badge"
+                android:paddingHorizontal="7dp"
+                android:paddingVertical="3dp"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:text="PSA 10"
+                tools:visibility="visible" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Title: the item name, single line so every card in the grid is the same height -->
+        <TextView
+            android:id="@+id/item_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAppearance="?attr/textAppearanceTitleSmall"
+            android:textColor="@color/vault_text"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text="Charizard ex" />
+
+        <!-- Set / subtitle: the all-caps metadata line called for in the guide's typography -->
+        <TextView
+            android:id="@+id/item_set"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textAppearance="?attr/textAppearanceLabelSmall"
+            android:textColor="@color/vault_text_muted"
+            android:textAllCaps="true"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text="Obsidian Flames · 125" />
+
+        <!-- Market price: high-contrast accent color so value reads at a glance -->
+        <TextView
+            android:id="@+id/item_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textStyle="bold"
+            android:textColor="@color/vault_secondary"
+            tools:text="$184.00" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

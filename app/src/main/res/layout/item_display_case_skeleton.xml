@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Skeleton (loading placeholder) version of item_display_case_card.xml (guide section 4.3).
+
+    It mirrors the real card's shape exactly - same rounded surface, same 2:3 image area,
+    same three text lines - but every piece of content is replaced by a gray shimmer block.
+    ShimmerHelper animates the opacity of the whole card so the grid gently pulses while the
+    images load from the API, instead of showing a blank screen or a bare spinner.
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/skeleton_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardBackgroundColor="@color/vault_surface"
+    app:strokeColor="@color/vault_outline"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <!-- Image placeholder: a 2:3 block matching the real artwork area -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/vault_shimmer_block"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintDimensionRatio="H,2:3" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Title placeholder -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="14dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/vault_shimmer_block" />
+
+        <!-- Set placeholder (shorter, like a real subtitle) -->
+        <View
+            android:layout_width="100dp"
+            android:layout_height="10dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/vault_shimmer_block" />
+
+        <!-- Price placeholder -->
+        <View
+            android:layout_width="64dp"
+            android:layout_height="14dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/vault_shimmer_block" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
